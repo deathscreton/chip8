@@ -1,0 +1,9 @@
+﻿  Chip8.cpp
+C:\Users\death\source\repos\Chip8 Emulator\src\Chip8.cpp(377,45): warning C4244: 'initializing': conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+C:\Users\death\source\repos\Chip8 Emulator\src\Chip8.cpp(377,30): warning C4244: 'initializing': conversion from 'std::streamoff' to 'const unsigned int', possible loss of data
+  Generating code
+  3 of 223 functions ( 1.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Chip8 Emulator.vcxproj -> C:\Users\death\source\repos\Chip8 Emulator\Release\Chip8 Emulator.exe
