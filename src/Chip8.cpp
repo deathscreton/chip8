@@ -27,6 +27,7 @@ char unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five 
     0xF0, 0x80, 0xF0, 0x80, 0x80    // F
 };
 
+
 Chip8::Chip8()
 {
     //std::cout << "Constructor initializing..." << std::endl;
@@ -67,9 +68,10 @@ Chip8::~Chip8()
     std::cout << "Destroying object..." << std::endl;
 }
 
+//Function responsible for a single emulated CPU cycle.
 void Chip8::emulateCycle()
 {
-    fetch();
+    findFunc(fetch());
 
     /*this switch test isolates the first 4 bits (nibble) of an opcode using the '&' bitwise operator
     along with 0xF000 in order to compare the nibble with case statements in order to find the correct
@@ -338,16 +340,24 @@ void Chip8::emulateCycle()
     }
 }
 
+//Fetches and stores the Opcode in class variable 'opcode'.
 short Chip8::fetch()
 {
-        /*pulls opcode by taking the program counter position
-        within the array, shifting it 8 bits to the left and
-        combining it with the portion of memory in the array
-        directly 1 byte to the right*/
-        opcode = memory[pc] << 8 | memory[pc + 1];
-        return opcode;
+    /*pulls opcode by taking the program counter position
+    within the array, shifting it 8 bits to the left and
+    combining it with the portion of memory in the array
+    directly 1 byte to the right*/
+
+    return opcode = memory[pc] << 8 | memory[pc + 1];
 }
 
+void Chip8::findFunc(short opcode)
+{
+    hiNibble = (memory[pc] & 0xF);
+    loNibble = ((memory[pc +1 ] & 0x0F) << 4);
+}
+
+//Function responsible for loading program into memory. Takes argc and a string pointer to determine path and file name.
 bool Chip8::loadROM(const int argc, const char* rom)
 {
     std::string romName;
@@ -414,6 +424,7 @@ bool Chip8::loadROM(const int argc, const char* rom)
     return true;
 }
 
+//Draws graphics buffer 'gfx[x][y]' to the console.
 void Chip8::debugRender()
 {
 
