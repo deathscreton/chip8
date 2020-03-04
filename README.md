@@ -11,3 +11,5 @@ You control the program using the keys below:
 '1234
  qwer
  asdf'
+
+You can ignote the VS19 solution files if you use a different IDE.
