@@ -21,10 +21,10 @@ public:
     void emulateCycle();
 
     //Fetches and stores the Opcode in class variable 'opcode'.
-    short fetch();
+    void fetch();
 
     //Takes opCode finds the function required to execute the opcode. 
-    void findFunc(short opcode);
+    void findFunc();
 
     //Draws graphics buffer 'gfx[x][y]' to the console.
     void debugRender();
@@ -36,10 +36,24 @@ public:
     ///PUBLIC MEMBER VARIABLES
     ///////////////////////
 
-    char unsigned gfx[64][32];                      //Screen buffer, 2048 pixels total. Switched to a 2D array, last buffer used 1D array with a 64 multiple offset for the y value.
-    char unsigned key[16];                          //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
+    char unsigned gfx[64][32]{0,0};                      //Screen buffer, 2048 pixels total. Switched to a 2D array, last buffer used 1D array with a 64 multiple offset for the y value.
+    char unsigned key[16]{0};                          //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
 
 private:
+
+    struct opFunc
+    {
+        std::string opName;
+        void (Chip8::* opCo)(void) {};
+    };
+
+    enum tableValue
+    {
+        Z = 1,
+        F = 2,
+    };
+
+    std::vector<opFunc> jmpTable;
 
     ///////////////////////
     ///PRIVATE MEMBER VARIABLES
@@ -64,7 +78,7 @@ private:
     ///////////////////////
     ///PRIVATE METHODS
     ///////////////////////
-
+    void CLS();
 
 }; //Class Chip8
 

@@ -30,6 +30,12 @@ char unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five 
 
 Chip8::Chip8()
 {
+    using a = Chip8;
+    jmpTable =
+    {               //0//               //1//
+     /*1*/   {"CLS", &a::CLS},      
+    };
+
     //std::cout << "Constructor initializing..." << std::endl;
 
     pc = 0x200;//0x200 == 512
@@ -71,7 +77,7 @@ Chip8::~Chip8()
 //Function responsible for a single emulated CPU cycle.
 void Chip8::emulateCycle()
 {
-    findFunc(fetch());
+    fetch();
 
     /*this switch test isolates the first 4 bits (nibble) of an opcode using the '&' bitwise operator
     along with 0xF000 in order to compare the nibble with case statements in order to find the correct
@@ -340,18 +346,27 @@ void Chip8::emulateCycle()
     }
 }
 
+////////////
+///OPCODE FUNCTION IMPLEMENTATION
+///////////
+
+void Chip8::CLS()
+{
+
+}
+
 //Fetches and stores the Opcode in class variable 'opcode'.
-short Chip8::fetch()
+void Chip8::fetch()
 {
     /*pulls opcode by taking the program counter position
     within the array, shifting it 8 bits to the left and
     combining it with the portion of memory in the array
     directly 1 byte to the right*/
 
-    return opcode = memory[pc] << 8 | memory[pc + 1];
+    opcode = memory[pc] << 8 | memory[pc + 1];
 }
 
-void Chip8::findFunc(short opcode)
+void Chip8::findFunc()
 {
     hiNibble = (memory[pc] & 0xF);
     loNibble = ((memory[pc +1 ] & 0x0F) << 4);
