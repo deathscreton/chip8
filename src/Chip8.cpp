@@ -30,10 +30,13 @@ char unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five 
 
 Chip8::Chip8()
 {
+    //Using to cutdown on an already lenghty list.
     using a = Chip8;
+    /*An initializer list that uses a 2D vector of type opFunc to store another initializer lists for struct opFunc initializers. 
+    The hiNibble and loNibble variables are used to locate the required function pointer that will populate the */
     jmpTable =
-    {               //0//               //1//
-     /*1*/   {"CLS", &a::CLS},      
+    {               //0//               //1//           //2//           //3//
+        {"zeroOp", &a::zeroOp}, {"JMP", &a::JMP}, {"CLS", &a::CLS}, 
     };
 
     //std::cout << "Constructor initializing..." << std::endl;
@@ -346,30 +349,9 @@ void Chip8::emulateCycle()
     }
 }
 
-////////////
-///OPCODE FUNCTION IMPLEMENTATION
-///////////
-
-void Chip8::CLS()
-{
-
-}
-
-//Fetches and stores the Opcode in class variable 'opcode'.
-void Chip8::fetch()
-{
-    /*pulls opcode by taking the program counter position
-    within the array, shifting it 8 bits to the left and
-    combining it with the portion of memory in the array
-    directly 1 byte to the right*/
-
-    opcode = memory[pc] << 8 | memory[pc + 1];
-}
-
 void Chip8::findFunc()
 {
-    hiNibble = (memory[pc] & 0xF);
-    loNibble = ((memory[pc +1 ] & 0x0F) << 4);
+    jmpTable[hiNibble];
 }
 
 //Function responsible for loading program into memory. Takes argc and a string pointer to determine path and file name.
@@ -439,6 +421,16 @@ bool Chip8::loadROM(const int argc, const char* rom)
     return true;
 }
 
+//Fetches and stores the Opcode in class variable 'opcode'.
+void Chip8::fetch()
+{
+    hiNibble = (memory[pc] & 0xF);
+    loNibble = ((memory[pc + 1] & 0x0F) << 4);
+
+    opcode = memory[pc] << 8 | memory[pc + 1];
+}
+
+#ifdef DEBUG
 //Draws graphics buffer 'gfx[x][y]' to the console.
 void Chip8::debugRender()
 {
@@ -457,4 +449,103 @@ void Chip8::debugRender()
     printf("\n");
 
 }
+#endif // DEBUG
 
+////////////
+///OPCODE FUNCTION IMPLEMENTATION
+///////////
+
+//Uses the loNibble to determine between 00E0 and 00EE.
+void Chip8::zeroOp()
+{
+    ((loNibble == 0) ? CLS() : RET());
+    //Code to determine specific function within '0x00NN' opcode, where NN is either 'E0' or 'EE'.
+}
+
+//Clears the display buffer.
+void Chip8::CLS()
+{
+    //Code for 00E0
+}
+
+//Returns from a subroutine.
+void Chip8::RET()
+{
+    //Code for 00EE
+}
+
+//1nnn: Jump to location nnn.
+void Chip8::JMP()
+{
+    //Code for opcode 1NNN.
+}
+
+//2nnn: Call subroutine at nnn.
+void Chip8::CALL()
+{
+    //Code for opcode 2NNN.
+}
+
+//3xkk: Skip next instruction if Vx = kk.
+void Chip8::SEVB()
+{
+    //Code for opcode 3XKK.
+}
+
+//4xkk: Skips next instruction if Vx != kk.
+void Chip8::SNEV()
+{
+    //Code for opcode 4XKK.
+}
+
+//5xy0: Skip next instruction if Vx = Vy.
+void Chip8::SEVV()
+{
+    //Code for opcode 5XY0.
+}
+
+//6xkk: Set Vx = kk.
+void Chip8::LDVB()
+{
+    //Code for opcode 6XKK.
+}
+
+//7xkk: Set Vx = Vx + kk.
+void Chip8::ADVB()
+{
+    //Code for opcode 7XKK.
+}
+
+//Uses the loNibble to determine which 8XXX opcode to run
+void Chip8::eightOp()
+{
+    //code for determining which 8XXX opcode to run
+}
+
+////
+//Future spot for 8XXX opcodes
+////
+
+//9xy0: Skip next instrucion if VX != Vy
+void Chip8::SNEVV()
+{
+    //Code for opcode 9XY0
+}
+
+//Annn: Set I = nnn.
+void Chip8::LDI()
+{
+    //Code for opcode ANNN
+}
+
+//Bnnn: Jump to location nnn + V0.
+void Chip8::JPV0()
+{
+    //Code for opcode BNNN
+}
+
+//Cxkk: Set Vx = random byte AND(bitwise) kk.
+void Chip8::RNDVB()
+{
+
+}

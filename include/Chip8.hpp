@@ -23,7 +23,7 @@ public:
     //Fetches and stores the Opcode in class variable 'opcode'.
     void fetch();
 
-    //Takes opCode finds the function required to execute the opcode. 
+    //Takes opCode and finds the function required to execute the opcode by using the hiNibble and loNibble respectively to locate the function intializer in vector jmpTable.
     void findFunc();
 
     //Draws graphics buffer 'gfx[x][y]' to the console.
@@ -41,19 +41,22 @@ public:
 
 private:
 
+    //Used as a typedef for opFunc and stores data passed to it by the initializer list in vector 'jmpTable'.
     struct opFunc
     {
         std::string opName;
-        void (Chip8::* opCo)(void) {};
+        void (Chip8::* opCo)(void) = nullptr;
     };
 
-    enum tableValue
-    {
-        Z = 1,
-        F = 2,
-    };
-
+    //Stores intializer lists of type 'opFunc' that contain pointers to a certain function. 
     std::vector<opFunc> jmpTable;
+
+
+    ///////////////////////
+    ///PRIVATE METHOD DECLARATIONS
+    ///////////////////////
+    void zeroOp(); void CLS(); void RET();
+    void JMP();
 
     ///////////////////////
     ///PRIVATE MEMBER VARIABLES
@@ -72,13 +75,9 @@ private:
     char unsigned hiNibble = 0x00;                  //Carries the high nibble of the opcode. Used to determine group function.
     char unsigned loNibble = 0x00;                  //Carries the low nibble of the opcode. Used to determine specific function.
 
-    char unsigned delayTimer;                       //Timer variable. Counts down at 60 Hz.
-    char unsigned soundTimer;                       //Sound variable. Counts down at 60 Hz. Rings at non-zero.
+    char unsigned delayTimer = 0;                       //Timer variable. Counts down at 60 Hz.
+    char unsigned soundTimer = 0;                       //Sound variable. Counts down at 60 Hz. Rings at non-zero.
 
-    ///////////////////////
-    ///PRIVATE METHODS
-    ///////////////////////
-    void CLS();
 
 }; //Class Chip8
 
