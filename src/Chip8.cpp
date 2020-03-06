@@ -36,7 +36,19 @@ Chip8::Chip8()
     The hiNibble and loNibble variables are used to locate the required function pointer that will populate the */
     jmpTable =
     {               //0//               //1//           //2//           //3//
-        {"zeroOp", &a::zeroOp}, {"JMP", &a::JMP}, {"CLS", &a::CLS}, 
+        {"zeroOp", &a::zeroOp}, {"CLS", &a::CLS},       {"RET", &a::RET},
+        {"JMP", &a::JMP},       {"CALL", &a::CALL},     {"SEXB", &a::SEXB},
+        {"SNEXB", &a::SNEXB},   {"SEXY", &a::SEXY},     {"LDXB", &a::LDXB},
+        {"ADXB", &a::ADXB},     {"eightOp", &a::ADXB},  {"LDXY", &a::LDXY},
+        {"ORXY", &a::ORXY},     {"ANDXY", &a::ANDXY},   {"XORXY", &a::XORXY},
+        {"ADDXY", &a::ADDXY},   {"SUBXY",& a::SUBXY},   {"SHRX", &a::SHRX},
+        {"SUBNXY", &a::SUBNXY}, {"SHLXY", &a::SHLXY},   {"SNEXY", &a::SNEXY},
+        {"LDI", &a::LDI},       {"JP0B", &a::JP0B},     {"RNDXB", &a::RNDXB},
+        {"DRWXY", &a::DRWXY},   {"hexEOp", &a::hexEOp}, {"SKPX", &a::SKPX},
+        {"SKNPX", &a::SKNPX},   {"fOp", &a::fOp},       {"LDXDT", &a::LDXDT},
+        {"LDXK", &a::LDXK},     {"LDDTX", &a::LDDTX},   {"LDSTX", &a::LDSTX},
+        {"ADDIX", &a::ADDIX},   {"LDFX", &a::LDFX},     {"LDBX", &a::LDBX},
+        {"LDIX", &a::LDIX},     {"LDIX", &a::LDIX},     {"0x0000", &a::XXXX},
     };
 
     //std::cout << "Constructor initializing..." << std::endl;
@@ -349,9 +361,20 @@ void Chip8::emulateCycle()
     }
 }
 
+//Find the initial opcode function using the hiNibble. If validOP returns true, the nibble is passed to jmpTable to initiate the function. If false, it hands off the program to the catch-all function XXXX.
 void Chip8::findFunc()
 {
-    jmpTable[hiNibble];
+    opFunc unknown = { "Unknown Opcode", &Chip8::XXXX};
+    if (validOp)
+        jmpTable[hiNibble].*opCo();
+    else
+        XXXX();
+}
+
+//Returns true if the nibble provided is apart of a valid opcode.
+bool Chip8::validOp(const char &nibble)
+{
+    return (0x0 <= nibble && nibble <= 0xF);
 }
 
 //Function responsible for loading program into memory. Takes argc and a string pointer to determine path and file name.
@@ -421,7 +444,7 @@ bool Chip8::loadROM(const int argc, const char* rom)
     return true;
 }
 
-//Fetches and stores the Opcode in class variable 'opcode'.
+//Fetches and stores the Opcode in class variable 'opcode'; sets hi and lo nibble for usage in findFunc.
 void Chip8::fetch()
 {
     hiNibble = (memory[pc] & 0xF);
@@ -465,13 +488,23 @@ void Chip8::zeroOp()
 //Clears the display buffer.
 void Chip8::CLS()
 {
-    //Code for 00E0
+    for (int x = 0; x < 64; x++)
+    {
+        for (int y = 0; y < 32; y++)
+        {
+            gfx[x][y] = 0;
+        }
+    }
+    drawFlag = true;
+    pc += 2;
 }
 
 //Returns from a subroutine.
 void Chip8::RET()
 {
-    //Code for 00EE
+    --sp;
+    pc = emuStack[sp];
+    pc += 2;
 }
 
 //1nnn: Jump to location nnn.
@@ -487,31 +520,31 @@ void Chip8::CALL()
 }
 
 //3xkk: Skip next instruction if Vx = kk.
-void Chip8::SEVB()
+void Chip8::SEXB()
 {
     //Code for opcode 3XKK.
 }
 
 //4xkk: Skips next instruction if Vx != kk.
-void Chip8::SNEV()
+void Chip8::SNEXB()
 {
     //Code for opcode 4XKK.
 }
 
 //5xy0: Skip next instruction if Vx = Vy.
-void Chip8::SEVV()
+void Chip8::SEXY()
 {
     //Code for opcode 5XY0.
 }
 
 //6xkk: Set Vx = kk.
-void Chip8::LDVB()
+void Chip8::LDXB()
 {
     //Code for opcode 6XKK.
 }
 
 //7xkk: Set Vx = Vx + kk.
-void Chip8::ADVB()
+void Chip8::ADXB()
 {
     //Code for opcode 7XKK.
 }
@@ -522,12 +555,63 @@ void Chip8::eightOp()
     //code for determining which 8XXX opcode to run
 }
 
-////
-//Future spot for 8XXX opcodes
-////
+//8xy0: Set Vx = Xy.
+void Chip8::LDXY()
+{
+    //Code for opcode 8XY0
+}
+
+//8xy1: Set Vx = Vx OR(bitwise) Vy.
+void Chip8::ORXY()
+{
+
+}
+
+//8xy2: Set Vx = Vx AND(bitwise) Vy.
+void Chip8::ANDXY()
+{
+
+}
+
+//8xy3: Set Vx = Vx XOR Vy.
+void Chip8::XORXY()
+{
+
+}
+
+//8xy4: Adds VY to VX. VF is set to 1 when there's a carry and 0 when there isn't. Then stores the result in VX.
+void Chip8::ADDXY()
+{
+
+}
+
+
+//8xy5: Compares VX to VY. If larger, set VF flag to 1, else set to 0, then subtract VY from VX, store the results in VX.
+void Chip8::SUBXY()
+{
+
+}
+
+//8xy6: Stores the least significant bit of VX in VF and then shifts VX to the right by 1
+void Chip8::SHRX()
+{
+
+}
+
+//8xy7: Compares VY to VX. If larger, set VF flag to 1, else set to 0, then subtract VX from VY, store the results in VX.
+void Chip8::SUBNXY()
+{
+
+}
+
+//8xyE: Stores the most significant bit of VX in VF and then shifts VX to the left by 1
+void Chip8::SHLXY()
+{
+
+}
 
 //9xy0: Skip next instrucion if VX != Vy
-void Chip8::SNEVV()
+void Chip8::SNEXY()
 {
     //Code for opcode 9XY0
 }
@@ -539,15 +623,15 @@ void Chip8::LDI()
 }
 
 //Bnnn: Jump to location nnn + V0.
-void Chip8::JPV0()
+void Chip8::JP0B()
 {
     //Code for opcode BNNN
 }
 
 //Cxkk: Set Vx = random byte AND(bitwise) kk.
-void Chip8::RNDVB()
+void Chip8::RNDXB()
 {
-
+    //Code for CXKK
 }
 
 //Dxyn: Display n-byte sprite starting at amemory location I at (Vx, Vy), set VF = collision.
@@ -557,10 +641,85 @@ void Chip8::DRWXY()
 }
 
 //Exnn: Determines what 'Exnn' opcode to branch to based on nn.
-void Chip8::hexEOp(  )
+void Chip8::hexEOp()
 {
     ((loNibble == 0xE) ? SKPX() : SKNPX());
 }
 
-//ExA1: Skip next instruction if key with the value of Vx is pressed.
-void Chip8::
+//Ex9E: Skip next instruction if key with the value of Vx is pressed.
+void Chip8::SKPX()
+{
+    //Code for opcode EX9E
+}
+
+//ExA1: Skip next instruction if key with the value of Vx is not pressed. 
+void Chip8::SKNPX()
+{
+    //Code for opcode EXA1
+}
+
+//Uses the entire loNibble to determine what FXXX opcode function to run. 
+void Chip8::fOp()
+{
+    //Code for determining which opcode to run. 
+}
+
+//Fx07: Set Vx = delay timer value.
+void Chip8::LDXDT()
+{
+
+}
+
+//Fx0A: Wait for a key press, store the value of the key in Vx.
+void Chip8::LDXK()
+{
+
+}
+
+//Fx15: Set delay timer = Vx.
+void Chip8::LDDTX()
+{
+
+}
+
+//Fx18: Set sound timer = Vx.
+void Chip8::LDSTX()
+{
+
+}
+
+//Fx1E: Set I = I + Vx.
+void Chip8::ADDIX()
+{
+
+}
+
+//Fx29: Set I= location of sprite for digit Vx.
+void Chip8::LDFX()
+{
+
+}
+
+//Fx33: Store BCD representation of Vx in memory locations I, I+1 and I+2. 
+void Chip8::LDBX()
+{
+
+}
+
+//Fx55: Store registers V- through Vx in memory starting a location I. 
+void Chip8::LDIX()
+{
+
+}
+
+//Fx65: Read register V0 through Vx from memory starting at location I.
+void Chip8::LDXI()
+{
+
+}
+
+//Catch all for unknown opcodes.
+void Chip8::XXXX()
+{
+
+}

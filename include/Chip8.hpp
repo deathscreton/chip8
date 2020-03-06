@@ -4,6 +4,7 @@
 class Chip8
 {
 public:
+    
     ///////////////////////
     //PUBLIC METHODS
     ///////////////////////
@@ -20,23 +21,16 @@ public:
     //Function responsible for a single emulated CPU cycle.
     void emulateCycle();
 
-    //Fetches and stores the Opcode in class variable 'opcode'.
-    void fetch();
-
-    //Takes opCode and finds the function required to execute the opcode by using the hiNibble and loNibble respectively to locate the function intializer in vector jmpTable.
-    void findFunc();
-
     //Draws graphics buffer 'gfx[x][y]' to the console.
     void debugRender();
-
-    //Determines if something was written to the display buffer and needs to be pushed.
-    bool drawFlag;
 
     ///////////////////////
     ///PUBLIC MEMBER VARIABLES
     ///////////////////////
 
-    char unsigned gfx[64][32]{0,0};                      //Screen buffer, 2048 pixels total. Switched to a 2D array, last buffer used 1D array with a 64 multiple offset for the y value.
+    bool drawFlag;                                     //Determines if something was written to the display buffer and needs to be pushed.
+
+    char unsigned gfx[64][32]{0,0};                    //Screen buffer, 2048 pixels total. Switched to a 2D array, last buffer used 1D array with a 64 multiple offset for the y value.
     char unsigned key[16]{0};                          //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
 
 private:
@@ -45,18 +39,42 @@ private:
     struct opFunc
     {
         std::string opName;
-        void (Chip8::* opCo)(void) = nullptr;
+        void (Chip8::*opCo)(void) = nullptr;
     };
 
     //Stores intializer lists of type 'opFunc' that contain pointers to a certain function. 
     std::vector<opFunc> jmpTable;
 
+    ///////////////////////
+    //PRIVATE HELPER FUNCTIONS
+    ///////////////////////
+
+    //Fetches and stores the Opcode in class variable 'opcode'; sets hi and lo nibble for usage in findFunc.
+    void fetch();
+
+    //Find the initial opcode function using the hinibble. If validOP returns true, the nibble is passed to jmpTable to initiate the function. If false, it hands off the program to the catch-all function XXXX.
+    void findFunc();
+
+    //Checks to make sure the opcode being generated is a legal instruction.
+    bool validOp(const char &nibble);
 
     ///////////////////////
-    ///PRIVATE METHOD DECLARATIONS
+    ///OPCODE FUNCTION DECLARATIONS
     ///////////////////////
-    void zeroOp(); void CLS(); void RET();
-    void JMP();
+
+    void zeroOp();  void CLS();     void RET();
+    void JMP();     void CALL();    void SEXB();
+    void SNEXB();   void SEXY();    void LDXB();
+    void ADXB();    void eightOp(); void LDXY();
+    void ORXY();    void ANDXY();   void XORXY();
+    void ADDXY();   void SUBXY();   void SHRX();
+    void SUBNXY();  void SHLXY();   void SNEXY();
+    void LDI();     void JP0B();    void RNDXB();
+    void DRWXY();   void hexEOp();  void SKPX();
+    void SKNPX();   void fOp();     void LDXDT();
+    void LDXK();    void LDDTX();   void LDSTX();      
+    void ADDIX();   void LDFX();    void LDBX();
+    void LDIX();    void LDXI();    void XXXX();
 
     ///////////////////////
     ///PRIVATE MEMBER VARIABLES
