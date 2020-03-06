@@ -549,3 +549,18 @@ void Chip8::RNDVB()
 {
 
 }
+
+//Dxyn: Display n-byte sprite starting at amemory location I at (Vx, Vy), set VF = collision.
+void Chip8::DRWXY()
+{
+    //Code for opcode DXYN
+}
+
+//Exnn: Determines what 'Exnn' opcode to branch to based on nn.
+void Chip8::hexEOp(  )
+{
+    ((loNibble == 0xE) ? SKPX() : SKNPX());
+}
+
+//ExA1: Skip next instruction if key with the value of Vx is pressed.
+void Chip8::
