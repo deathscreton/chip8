@@ -56,7 +56,7 @@ private:
     void findFunc();
 
     //Checks to make sure the opcode being generated is a legal instruction.
-    bool isValidOp(const char &nibble);
+    bool validOp(const char &nibble);
 
     ///////////////////////
     ///OPCODE FUNCTION DECLARATIONS
