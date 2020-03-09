@@ -35,21 +35,26 @@ public:
 
 private:
 
-    //Used as a typedef for opFunc and stores data passed to it by the initializer list in vector 'jmpTable'.
+    /*Used as a typedef for opFunc and stores data passed to it by the initializer list in vector 'jmpTable'.*/
     struct opFunc
     {
         std::string opName;
         void (Chip8::*opCo)(void) = nullptr;
     };
 
+    //Supplies an offset for child opcodes that are derived from a parent opcode like 8XXX. This offset is used to determine which opcode function is ran from within vector childFuncTable. 
+    enum childFuncOffset { noOffset = 0, opCode8 = 2, opCodeE = 11, opCodeF = 13, } offset;
+
     //Stores intializer lists of type 'opFunc' that contain pointers to a certain function. 
     std::vector<opFunc> jmpTable;
+    //Stores initializer lists of type 'opFunc' that contain pointers to opcode functions (child functions) derived from a parent opcode, such as 8XXX.
+    std::vector<opFunc> childFuncTable;
 
     ///////////////////////
     //PRIVATE HELPER FUNCTIONS
     ///////////////////////
 
-    //Fetches and stores the Opcode in class variable 'opcode'; sets hi and lo nibble for usage in findFunc.
+    //Fetches and stores the Opcode in class variable 'opcode'; sets hi and lo nibble for usage in findFunc. Also sets the offset for child opcode functions in childFuncTable.
     void fetch();
 
     //Find the initial opcode function using the hinibble. If validOP returns true, the nibble is passed to jmpTable to initiate the function. If false, it hands off the program to the catch-all function XXXX.
@@ -57,6 +62,9 @@ private:
 
     //Checks to make sure the opcode being generated is a legal instruction.
     bool isValidOp(const char &nibble);
+
+    //Function responsible for returning the offset value based on the child opcode function requested by the loNibble.
+    enum childFuncOffset getOffset();
 
     ///////////////////////
     ///OPCODE FUNCTION DECLARATIONS
@@ -93,8 +101,8 @@ private:
     char unsigned hiNibble = 0x00;                  //Carries the high nibble of the opcode. Used to determine group function.
     char unsigned loNibble = 0x00;                  //Carries the low nibble of the opcode. Used to determine specific function.
 
-    char unsigned delayTimer = 0;                       //Timer variable. Counts down at 60 Hz.
-    char unsigned soundTimer = 0;                       //Sound variable. Counts down at 60 Hz. Rings at non-zero.
+    char unsigned delayTimer = 0;                   //Timer variable. Counts down at 60 Hz.
+    char unsigned soundTimer = 0;                   //Sound variable. Counts down at 60 Hz. Rings at non-zero.
 
 
 }; //Class Chip8

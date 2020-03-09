@@ -169,10 +169,12 @@ void emulationLoop()
                     mainWindow.draw(chip8SpriteRect);
                 }
             }
-#ifdef DEBUG
+            #ifdef _DEBUG
             chip8.debugRender();
-#endif // DEBUG
+            #endif // DEBUG
+
             mainWindow.display();
+
             chip8.drawFlag = false;
         }
     }
