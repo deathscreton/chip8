@@ -35,7 +35,7 @@ public:
 
 private:
 
-    /*Used as a typedef for opFunc and stores data passed to it by the initializer list in vector 'jmpTable'.*/
+    /*Used as a typedef for opFunc and stores data passed to it by the initializer list in vector 'parentFuncTable'.*/
     struct opFunc
     {
         std::string opName;
@@ -46,7 +46,8 @@ private:
     enum childFuncOffset { noOffset = 0, opCode8 = 2, opCodeE = 11, opCodeF = 13, } offset;
 
     //Stores intializer lists of type 'opFunc' that contain pointers to a certain function. 
-    std::vector<opFunc> jmpTable;
+    std::vector<opFunc> parentFuncTable;
+
     //Stores initializer lists of type 'opFunc' that contain pointers to opcode functions (child functions) derived from a parent opcode, such as 8XXX.
     std::vector<opFunc> childFuncTable;
 
@@ -57,7 +58,7 @@ private:
     //Fetches and stores the Opcode in class variable 'opcode'; sets hi and lo nibble for usage in findFunc. Also sets the offset for child opcode functions in childFuncTable.
     void fetch();
 
-    //Find the initial opcode function using the hinibble. If validOP returns true, the nibble is passed to jmpTable to initiate the function. If false, it hands off the program to the catch-all function XXXX.
+    //Find the initial opcode function using the hinibble. If validOP returns true, the nibble is passed to parentFuncTable to initiate the function. If false, it hands off the program to the catch-all function XXXX.
     void findFunc();
 
     //Checks to make sure the opcode being generated is a legal instruction.

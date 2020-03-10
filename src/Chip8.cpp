@@ -34,7 +34,7 @@ Chip8::Chip8()
     using a = Chip8;
     /*An initializer list that uses a vector of type opFunc to store another initializer lists for struct opFunc initializers. 
     The hiNibble and loNibble variables are used to locate the required function pointer that will populate the */
-    jmpTable =
+    parentFuncTable =
     {            //0//               //1//                      //2//
         {"zeroOp", &a::zeroOp}, {"JMP", &a::JMP},       {"CALL", &a::CALL},        
         {"SEXB", &a::SEXB},     {"SNEXB", &a::SNEXB},   {"SEXY", &a::SEXY},     
@@ -116,10 +116,10 @@ void Chip8::emulateCycle()
     }
 }
 
-//Find the initial opcode function using the hiNibble. If isValidOP returns true, the nibble is passed to jmpTable to initiate the function. If false, it hands off the program to the catch-all function XXXX.
+//Find the initial opcode function using the hiNibble. If isValidOP returns true, the nibble is passed to parentFuncTable to initiate the function. If false, it hands off the program to the catch-all function XXXX.
 void Chip8::findFunc()
 {
-    if (isValidOp(hiNibble)) (this->*jmpTable[hiNibble].opCo)();
+    if (isValidOp(hiNibble)) (this->*parentFuncTable[hiNibble].opCo)();
     else
     {
         opFunc unknown = { "Unknown Opcode", &Chip8::XXXX };
