@@ -149,7 +149,7 @@ bool Chip8::loadROM(const int argc, const char* rom)
     }
     else
     {
-        std::cerr << "Something went terribly wrong when collecting rom name. CHIP8.CPP LN: 369" << std::endl;
+        std::cerr << "Something went terribly wrong when collecting rom name." << std::endl;
         return false;
     }
 

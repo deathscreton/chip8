@@ -128,6 +128,19 @@ void keyStatePressed(sf::Event keyState)
     }
 }
 
+void pushBuffer() //fills the SFML window buffer with the gfx buffer from the chip8 then draws it to the screen.
+{
+    for (int y = 0; y < 32; ++y)
+    {
+        for (int x = 0; x < 64; ++x)
+        {
+            if (chip8.gfx[x][y] == 1)
+                chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR);//multiply the position value by the scale factor 12.5 so nothing overlaps
+            mainWindow.draw(chip8SpriteRect);
+        }
+    }
+}
+
 void emulationLoop()
 {
     mainWindow.setFramerateLimit(60);
@@ -158,18 +171,11 @@ void emulationLoop()
         {
             mainWindow.clear(sf::Color::Black);
 
-            for (int y = 0; y < 32; ++y)
-            {
-                for (int x = 0; x < 64; ++x)
-                {
-                    if (chip8.gfx[x][y] == 1)
-                        chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR);//multiply the position value by the scale factor 12.5 so nothing overlaps
-                    mainWindow.draw(chip8SpriteRect);
-                }
-            }
+            pushBuffer();
+            
             #ifdef _DEBUG
             chip8.debugRender();
-            #endif // DEBUG
+            #endif // _DEBUG
 
             mainWindow.display();
 
@@ -184,7 +190,8 @@ int main(int argc, char* argv[])
         emulationLoop();
     else
     {
-        std::cout << "Error: Something failed with loading the ROM." << std::endl;
+        std::cerr << "Error: Something failed with loading the ROM." << std::endl;
+        std::cin.get();
         return 1;
     }
     return 0;
