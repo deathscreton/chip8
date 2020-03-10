@@ -9,10 +9,10 @@
 
 #define SCALE_FACTOR 12.5f
 
-Chip8 chip8; //creates object and initializes class state using constructor
+Chip8 chip8; //creates emulator object and initializes class state using constructor
 sf::Event event;
 sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //create and declare window
-sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR));//create RectangleShape object with a size of 12.5f, which is also the scale factor
+sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR)); //create RectangleShape object with a size of 12.5f, which is also the scale factor
 
 void keyStateReleased(sf::Event keyState)
 {
