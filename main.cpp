@@ -9,12 +9,12 @@
 
 #define SCALE_FACTOR 12.5f
 
-void keyStatePressed(sf::Event); //function encapsulating key states; moved from emulationLoop for legibility reasons
-void keyStateReleased(sf::Event); //function encapsulating key states; moved from emulationLoop for legibility reasons
-
 Chip8 chip8; //creates object and initializes class state using constructor
+sf::Event event;
+sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //create and declare window
+sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR));//create RectangleShape object with a size of 12.5f, which is also the scale factor
 
-void keyStateReleased(sf::Event keyState) //moved outside of the emulationLoop for legibility
+void keyStateReleased(sf::Event keyState)
 {
     switch (keyState.key.code)
     {
@@ -71,7 +71,7 @@ void keyStateReleased(sf::Event keyState) //moved outside of the emulationLoop f
     }
 }
 
-void keyStatePressed(sf::Event keyState) //moved outside of the emulationLoop for legibility
+void keyStatePressed(sf::Event keyState)
 {
     switch (keyState.key.code)
     {
@@ -130,9 +130,6 @@ void keyStatePressed(sf::Event keyState) //moved outside of the emulationLoop fo
 
 void emulationLoop()
 {
-    sf::Event event;
-    sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //create and declare window
-    sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR));//create RectangleShape object with a size of 12.5, which is also the scale factor
     mainWindow.setFramerateLimit(60);
 
     while (mainWindow.isOpen())
@@ -154,6 +151,7 @@ void emulationLoop()
                 break;
             }
         }
+
         chip8.emulateCycle();
 
         if (chip8.drawFlag)

@@ -50,9 +50,9 @@ Chip8::Chip8()
     {       
         {"CLS", &a::CLS},       {"RET", &a::RET},                                       //Offset 0: 00XX Opcodes
 
-        {"LDXY", &a::LDXY},     {"ORXY", &a::ORXY},      {"ANDXY", &a::ANDXY},          /////
-        {"XORXY", &a::XORXY},   { "ADDXY", &a::ADDXY },  { "SUBXY",&a::SUBXY },         //Offset 2: 8XXX Opcodes
-        { "SHRX", &a::SHRX },   { "SUBNXY", &a::SUBNXY },{ "SHLXY", &a::SHLXY },        /////
+        {"LDXY", &a::LDXY},     {"ORXY", &a::ORXY},    {"ANDXY", &a::ANDXY},            /////
+        {"XORXY", &a::XORXY},   {"ADDXY", &a::ADDXY},  {"SUBXY",&a::SUBXY},             //Offset 2: 8XXX Opcodes
+        {"SHRX", &a::SHRX},     {"SUBNXY", &a::SUBNXY},{"SHLXY", &a::SHLXY},            /////
 
         {"SKPX", &a::SKPX},     {"SKNPX", &a::SKNPX},                                   //Offset 11: EXXX Opcodes
 
