@@ -9,12 +9,12 @@
 
 #define SCALE_FACTOR 12.5f
 
-void keyStatePressed(sf::Event); //function encapsulating key states; moved from emulationLoop for legibility reasons
-void keyStateReleased(sf::Event); //function encapsulating key states; moved from emulationLoop for legibility reasons
+Chip8 chip8; //creates emulator object and initializes class state using constructor
+sf::Event event;
+sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //create and declare window
+sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR)); //create RectangleShape object with a size of 12.5f, which is also the scale factor
 
-Chip8 chip8; //creates object and initializes class state using constructor
-
-void keyStateReleased(sf::Event keyState) //moved outside of the emulationLoop for legibility
+void keyStateReleased(sf::Event keyState)
 {
     switch (keyState.key.code)
     {
@@ -71,7 +71,7 @@ void keyStateReleased(sf::Event keyState) //moved outside of the emulationLoop f
     }
 }
 
-void keyStatePressed(sf::Event keyState) //moved outside of the emulationLoop for legibility
+void keyStatePressed(sf::Event keyState)
 {
     switch (keyState.key.code)
     {
@@ -128,11 +128,21 @@ void keyStatePressed(sf::Event keyState) //moved outside of the emulationLoop fo
     }
 }
 
+void pushBuffer() //fills the SFML window buffer with the gfx buffer from the chip8 then draws it to the screen.
+{
+    for (int y = 0; y < 32; ++y)
+    {
+        for (int x = 0; x < 64; ++x)
+        {
+            if (chip8.gfx[x][y] == 1)
+                chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR);//multiply the position value by the scale factor 12.5 so nothing overlaps
+            mainWindow.draw(chip8SpriteRect);
+        }
+    }
+}
+
 void emulationLoop()
 {
-    sf::Event event;
-    sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //create and declare window
-    sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR));//create RectangleShape object with a size of 12.5, which is also the scale factor
     mainWindow.setFramerateLimit(60);
 
     while (mainWindow.isOpen())
@@ -154,25 +164,21 @@ void emulationLoop()
                 break;
             }
         }
+
         chip8.emulateCycle();
 
         if (chip8.drawFlag)
         {
             mainWindow.clear(sf::Color::Black);
 
-            for (int y = 0; y < 32; ++y)
-            {
-                for (int x = 0; x < 64; ++x)
-                {
-                    if (chip8.gfx[x][y] == 1)
-                        chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR);//multiply the position value by the scale factor 12.5 so nothing overlaps
-                    mainWindow.draw(chip8SpriteRect);
-                }
-            }
-#ifdef DEBUG
+            pushBuffer();
+            
+            #ifdef _DEBUG
             chip8.debugRender();
-#endif // DEBUG
+            #endif // _DEBUG
+
             mainWindow.display();
+
             chip8.drawFlag = false;
         }
     }
@@ -184,7 +190,8 @@ int main(int argc, char* argv[])
         emulationLoop();
     else
     {
-        std::cout << "Error: Something failed with loading the ROM." << std::endl;
+        std::cerr << "Error: Something failed with loading the ROM." << std::endl;
+        std::cin.get();
         return 1;
     }
     return 0;
