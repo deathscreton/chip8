@@ -138,7 +138,8 @@ bool Chip8::loadROM(const int argc, const char* rom)
 {
     std::string romName;
 
-    if (argc < 2)//check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
+    //Check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
+    if (argc < 2)
     {
         std::cout << "Enter the absolute ROM file path(extension included): \n";
         getline(std::cin, romName);

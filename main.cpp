@@ -9,10 +9,10 @@
 
 #define SCALE_FACTOR 12.5f
 
-Chip8 chip8; //creates emulator object and initializes class state using constructor
+Chip8 chip8; //Creates emulator object and initializes class state using constructor
 sf::Event event;
-sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //create and declare window
-sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR)); //create RectangleShape object with a size of 12.5f, which is also the scale factor
+sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //Create and declare Window object for rendering.
+sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR)); //Create RectangleShape object with a size of 12.5f, which is also the scale factor.
 
 void keyStateReleased(sf::Event keyState)
 {
@@ -128,14 +128,14 @@ void keyStatePressed(sf::Event keyState)
     }
 }
 
-void pushBuffer() //fills the SFML window buffer with the gfx buffer from the chip8 then draws it to the screen.
+void pushBuffer() //Fills the SFML window buffer with the gfx buffer from the chip8 then draws it to the screen.
 {
     for (int y = 0; y < 32; ++y)
     {
         for (int x = 0; x < 64; ++x)
         {
             if (chip8.gfx[x][y] == 1)
-                chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR);//multiply the position value by the scale factor 12.5 so nothing overlaps
+                chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR); //Multiply the position value by the scale factor 12.5 so nothing overlaps
             mainWindow.draw(chip8SpriteRect);
         }
     }
