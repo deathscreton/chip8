@@ -7,7 +7,7 @@
 
 #include "Chip8.hpp"
 
-#define SCALE_FACTOR 12.5f
+#define SCALE_FACTOR 12.5f //ratio between resolutions 64x32 and 800x600
 
 Chip8 chip8; //Creates emulator object and initializes class state using constructor
 sf::Event event;
@@ -134,8 +134,8 @@ void pushBuffer() //Fills the SFML window buffer with the gfx buffer from the ch
     {
         for (int x = 0; x < 64; ++x)
         {
-            if (chip8.gfx[x][y] == 1)
-                chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR); //Multiply the position value by the scale factor 12.5 so nothing overlaps
+            if (chip8.gfx[x][y] == 1) chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR); //Multiply the position value by the scale factor 12.5 so nothing overlaps
+            
             mainWindow.draw(chip8SpriteRect);
         }
     }
@@ -186,8 +186,7 @@ void emulationLoop()
 
 int main(int argc, char* argv[])
 {
-    if (chip8.loadROM(argc, argv[1]))
-        emulationLoop();
+    if (chip8.loadROM(argc, argv[1])) emulationLoop();
     else
     {
         std::cerr << "Error: Something failed with loading the ROM." << std::endl;

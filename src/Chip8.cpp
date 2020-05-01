@@ -504,6 +504,7 @@ void Chip8::DRWXY()
     for (int yline = 0; yline < height; yline++)//loop for however many rows there are which is determined by 'height'
     {
         pixel = memory[I + yline];//grab the byte from memory and store it in the variable 'pixel'. each bit in this byte is a set value for a pixel to be drawn.
+
         for (int xline = 0; xline < 8; xline++)//loop for all eight bits
         {
             if ((pixel & (0x80 >> xline)) != 0)//scans the bits one at a time. if the current bit is 1, then it needs to be checked for collision. shifts bits to the right based on loop iteration.
