@@ -16,13 +16,22 @@ public:
     ~Chip8();
 
     //Function responsible for loading program into memory. Takes argc and a string pointer to determine path and file name.
-    bool loadROM(const int argc, const char* rom);
+    bool loadROM();
     
     //Function responsible for a single emulated CPU cycle.
     void emulateCycle();
 
     //Draws graphics buffer 'gfx[x][y]' to the console.
     void debugRender();
+
+    //Resets program using current ROM in memory.
+    void softReset();
+
+    //Resets program and clears ALL memory. Reruns loadRom function. 
+    void hardReset();
+
+    //Method responsible for setting chip8 opening variables from argc and argv. 
+    bool setOpenParams(const int argc, const char* rom);
 
     ///////////////////////
     ///PUBLIC MEMBER VARIABLES
@@ -42,7 +51,7 @@ private:
         void (Chip8::*opCo)(void) = nullptr;
     };
 
-    //Supplies an offset for child opcodes that are derived from a parent opcode like 8XXX. This offset is used to determine which opcode function is ran from within vector childFuncTable. 
+    //Defines the offset required to select the proper childOpcode based on the parentOpcode.
     enum childFuncOffset { noOffset = 0, opCode8 = 2, opCodeE = 11, opCodeF = 13, } offset;
 
     //Stores intializer lists of type 'opFunc' that contain pointers to a certain function. 
@@ -91,6 +100,7 @@ private:
 
     char unsigned memory[4096];                     //4KB of memory used to store the ROM and other bits of important data.
     short unsigned emuStack[16];                    //Array that emulate the Stack; capable of storing sixteen levels of indirections.
+    short unsigned openArg;                         //Object member that stores argc values.
 
     char unsigned V[16];                            //registers from V0 to VF, with VF being used for flags
 
@@ -105,6 +115,7 @@ private:
     char unsigned delayTimer = 0;                   //Timer variable. Counts down at 60 Hz.
     char unsigned soundTimer = 0;                   //Sound variable. Counts down at 60 Hz. Rings at non-zero.
 
+    std::string romName;                            //String variable that carries the current ROM in memory.
 
 }; //Class Chip8
 

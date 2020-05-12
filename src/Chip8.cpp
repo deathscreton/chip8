@@ -99,6 +99,85 @@ Chip8::~Chip8()
 
 }
 
+void Chip8::softReset()
+{
+    pc = 0x200;//0x200 == 512
+    I = 0;
+    opcode = 0;
+    sp = 0;
+    delayTimer = 0;
+    soundTimer = 0;
+
+    //clears screen buffer
+    for (int x = 0; x < 64; x++)
+        for (int y = 0; y < 32; y++)
+            gfx[x][y] = 0;
+
+    //nulls the stack
+    for (int x = 0; x < 16; x++)
+        emuStack[x] = 0;
+
+    //nulls all registers
+    for (int x = 0; x < 16; x++)
+        V[x] = 0;
+
+    //clears all key registers
+    for (int x = 0; x < 16; x++)
+        key[x] = 0;
+
+    drawFlag = true;
+
+#ifdef _DEBUG
+    std::cout << "Current ROM loaded:" << romName;
+#endif // _DEBUG
+
+}
+
+void Chip8::hardReset()
+{
+    pc = 0x200;//0x200 == 512
+    I = 0;
+    opcode = 0;
+    sp = 0;
+    delayTimer = 0;
+    soundTimer = 0;
+
+    //clears screen buffer
+    for (int x = 0; x < 64; x++)
+        for (int y = 0; y < 32; y++)
+            gfx[x][y] = 0;
+
+    //nulls memory for initialization
+    for (int x = 0; x < 4096; x++)
+        memory[x] = 0;
+
+    //fill memory with fontset
+    for (int x = 0; x < 80; x++)
+        memory[x] = fontset[x];
+
+    //nulls the stack
+    for (int x = 0; x < 16; x++)
+        emuStack[x] = 0;
+
+    //nulls all registers
+    for (int x = 0; x < 16; x++)
+        V[x] = 0;
+
+    //clears all key registers
+    for (int x = 0; x < 16; x++)
+        key[x] = 0;
+
+    drawFlag = true;
+
+    std::cout << "Enter the absolute ROM file path(extension included): \n";
+    getline(std::cin, romName);
+
+#ifdef _DEBUG
+    std::cout << "Current ROM being loaded:" << romName;
+#endif // _DEBUG
+
+}
+
 //Function responsible for a single emulated CPU cycle.
 void Chip8::emulateCycle()
 {
@@ -134,31 +213,14 @@ bool Chip8::isValidOp(const char &nibble)
 }
 
 //Function responsible for loading program into memory. Takes argc and a string pointer to determine path and file name.
-bool Chip8::loadROM(const int argc, const char* rom)
+bool Chip8::loadROM()
 {
-    std::string romName;
-
-    //Check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
-    if (argc < 2)
-    {
-        std::cout << "Enter the absolute ROM file path(extension included): \n";
-        getline(std::cin, romName);
-    }
-    else if (argc == 2)
-    {
-        romName = rom;
-    }
-    else
-    {
-        std::cerr << "Something went terribly wrong when collecting rom name." << std::endl;
-        return false;
-    }
-
-    //open rom file using name passed from argv or cin.
+    
+    //open rom file using name set by setOpenParams or hardReset
     std::ifstream romfile(romName.data(), std::ios::binary);
     if (!romfile)
     {
-        std::cerr << "Error opening " << rom << ". Please check the name of your file and try again." << std::endl;
+        std::cerr << "Error opening " << romName << ". Please check the name of your file and try again." << std::endl;
         return false;
     }
 
@@ -210,6 +272,7 @@ void Chip8::fetch()
     loNibble = (memory[pc + 1]);
 }
 
+//Supplies an offset for child opcodes that are derived from a parent opcode like 8XXX. This offset is used to determine which opcode function is ran from within vector childFuncTable. 
 enum Chip8::childFuncOffset Chip8::getOffset()
 {
     switch (hiNibble)
@@ -249,6 +312,27 @@ void Chip8::debugRender()
 
 }
 #endif // _DEBUG
+
+bool Chip8::setOpenParams(const int argc, const char* rom)
+{
+    //Check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
+    if (argc < 2)
+    {
+        std::cout << "Enter the absolute ROM file path(extension included): \n";
+        getline(std::cin, romName);
+        return true;
+    }
+    else if (argc == 2)
+    {
+        romName = rom;
+        return true;
+    }
+    else
+    {
+        std::cerr << "Something went terribly wrong when collecting rom name." << std::endl;
+        return false;
+    }
+}
 
 ////////////
 ///OPCODE FUNCTION IMPLEMENTATION

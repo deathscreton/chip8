@@ -7,12 +7,30 @@
 
 #include "Chip8.hpp"
 
+//MACROS//
+
 #define SCALE_FACTOR 12.5f //ratio between resolutions 64x32 and 800x600
+
+//MACROS END//
+
+//OBJECT INITIALIZATION//
 
 Chip8 chip8; //Creates emulator object and initializes class state using constructor
 sf::Event event;
 sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //Create and declare Window object for rendering.
 sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR)); //Create RectangleShape object with a size of 12.5f, which is also the scale factor.
+
+//OBJECT INITIALIZATION END//
+
+//FUNCTION DECLARATION//
+
+void keyStateReleased(sf::Event keyState);
+void keyStatePressed(sf::Event keyState);
+void pushBuffer();
+void emulationLoop();
+
+//FUNCTION DECLARATION END//
+
 
 void keyStateReleased(sf::Event keyState)
 {
@@ -75,6 +93,19 @@ void keyStatePressed(sf::Event keyState)
 {
     switch (keyState.key.code)
     {
+    case sf::Keyboard::Escape:
+        mainWindow.close();
+        break;
+    case sf::Keyboard::F1:
+        chip8.softReset();
+        emulationLoop();
+        break;
+    case sf::Keyboard::F2:
+        mainWindow.clear(sf::Color::Black);
+        mainWindow.display();
+        chip8.hardReset();
+        chip8.loadROM();
+        break;
     case sf::Keyboard::Num1:
         chip8.key[0x1] = 1;
         break;
@@ -186,11 +217,22 @@ void emulationLoop()
 
 int main(int argc, char* argv[])
 {
-    if (chip8.loadROM(argc, argv[1])) emulationLoop();
+    if (chip8.setOpenParams(argc, argv[1]))
+    {
+        if (chip8.loadROM())
+        {
+            emulationLoop();
+        }
+        else
+        {
+            std::cerr << "Error: Something failed with loading the ROM. Check provided errors and try again." << std::endl;
+            std::cin.get();
+            return 1;
+        }
+    }
     else
     {
-        std::cerr << "Error: Something failed with loading the ROM." << std::endl;
-        std::cin.get();
+        std::cerr << "Something failed with setting opening program parameters.";
         return 1;
     }
     return 0;
