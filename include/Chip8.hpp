@@ -38,6 +38,7 @@ public:
     ///////////////////////
 
     bool drawFlag;                                     //Determines if something was written to the display buffer and needs to be pushed.
+    bool playSound;                                    //Determines if the beep sound is ready to play. 
 
     char unsigned gfx[64][32]{0,0};                    //Screen buffer, 2048 pixels total. Switched to a 2D array, last buffer used 1D array with a 64 multiple offset for the y value.
     char unsigned key[16]{0};                          //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
@@ -72,6 +73,9 @@ private:
 
     //Checks to make sure the opcode being generated is a legal instruction.
     bool isValidOp(const char &nibble);
+
+    //Checks to see if a sound needs to be played. If so, returns true.
+    bool isSoundReady();
 
     //Function responsible for returning the offset value based on the child opcode function requested by the loNibble.
     enum childFuncOffset getOffset();

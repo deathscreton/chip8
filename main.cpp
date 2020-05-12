@@ -4,8 +4,19 @@
 
 #include "SFML\Graphics.hpp"
 #include "SFML\Window\Keyboard.hpp"
+#include "SFML\Audio.hpp"
 
 #include "Chip8.hpp"
+
+//Chunk of code responsible for resolving "unresolved external symbol __iob_func linker" errors. 
+//Had to include legacy_stdio_definitions.lib as well. Will debug this later. 
+#define stdin  (__acrt_iob_func(0))
+#define stdout (__acrt_iob_func(1))
+#define stderr (__acrt_iob_func(2))
+
+FILE _iob[] = { *stdin, *stdout, *stderr };
+extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
+//
 
 //MACROS//
 
@@ -16,7 +27,9 @@
 //OBJECT INITIALIZATION//
 
 Chip8 chip8; //Creates emulator object and initializes class state using constructor
-sf::Event event;
+sf::Event event; //Creates event object to contain event types necessary for interactivity.
+sf::SoundBuffer beepBuffer; //Creates sound buffer to hold beep.wav file.
+sf::Sound beepSound; //Creates sound object to control buffer playback.
 sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //Create and declare Window object for rendering.
 sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR)); //Create RectangleShape object with a size of 12.5f, which is also the scale factor.
 
@@ -172,10 +185,10 @@ void pushBuffer() //Fills the SFML window buffer with the gfx buffer from the ch
     }
 }
 
-void emulationLoop()
+void emulationLoop() //Main emulation loop responsible for running cycles, checking events, playing sounds, etc.
 {
     mainWindow.setFramerateLimit(60);
-
+    
     while (mainWindow.isOpen())
     {
         while (mainWindow.pollEvent(event))
@@ -212,6 +225,12 @@ void emulationLoop()
 
             chip8.drawFlag = false;
         }
+
+        if (chip8.playSound)
+        {
+            beepSound.play();
+            chip8.playSound = false;
+        }
     }
 }
 
@@ -221,6 +240,14 @@ int main(int argc, char* argv[])
     {
         if (chip8.loadROM())
         {
+            if (!beepBuffer.loadFromFile("beep.wav"))
+            {
+                std::cerr << "Error loading sound file. Please check that the file name is beep.wav and is located next to the executable. Continuing execution..." << std::endl;
+            }
+            else
+            {
+                beepSound.setBuffer(beepBuffer);
+            }
             emulationLoop();
         }
         else

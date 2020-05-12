@@ -91,6 +91,7 @@ Chip8::Chip8()
     for (int x = 0; x < 16; x++)
         V[x] = 0;
 
+    playSound = false;
     drawFlag = true;
 }
 
@@ -189,9 +190,24 @@ void Chip8::emulateCycle()
         --delayTimer;
     if (soundTimer > 0)
     {
-        if (soundTimer == 1)
-            std::cout << "BEEP MOFO" << std::endl;
+        if (isSoundReady())
+        {
+            playSound = true;
+        }
         --soundTimer;
+    }
+}
+
+//Checks to see if a sound needs to be played. If so, returns true.
+bool Chip8::isSoundReady()
+{
+    if (soundTimer == 1)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -506,7 +522,6 @@ void Chip8::ADDXY()
     V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
     pc += 2;
 }
-
 
 //8xy5: Compares VX to VY. If larger, set VF flag to 1, else set to 0, then subtract VY from VX, store the results in VX.
 void Chip8::SUBXY()
