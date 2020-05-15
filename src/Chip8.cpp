@@ -131,7 +131,6 @@ void Chip8::softReset()
 #ifdef _DEBUG
     std::cout << "Current ROM loaded:" << romName;
 #endif // _DEBUG
-
 }
 
 void Chip8::hardReset()
@@ -176,7 +175,6 @@ void Chip8::hardReset()
 #ifdef _DEBUG
     std::cout << "Current ROM being loaded:" << romName;
 #endif // _DEBUG
-
 }
 
 //Function responsible for a single emulated CPU cycle.
@@ -228,10 +226,9 @@ bool Chip8::isValidOp(const char &nibble)
     return (0x00 <= nibble && nibble <= 0xF);
 }
 
-//Function responsible for loading program into memory. Takes argc and a string pointer to determine path and file name.
+//Function responsible for loading program into memory.
 bool Chip8::loadROM()
 {
-    
     //open rom file using name set by setOpenParams or hardReset
     std::ifstream romfile(romName.data(), std::ios::binary);
     if (!romfile)

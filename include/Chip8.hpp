@@ -15,7 +15,7 @@ public:
     //Destructor
     ~Chip8();
 
-    //Function responsible for loading program into memory. Takes argc and a string pointer to determine path and file name.
+    //Function responsible for loading program into memory.
     bool loadROM();
     
     //Function responsible for a single emulated CPU cycle.
