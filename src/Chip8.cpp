@@ -348,8 +348,8 @@ bool Chip8::setOpenParams(const int argc, const char* rom)
 }
 
 ////////////
-///OPCODE FUNCTION IMPLEMENTATION
-///////////
+///CHIP8 OPCODE FUNCTION IMPLEMENTATION
+////////////
 
 //Uses the loNibble to determine between 00E0 and 00EE.
 void Chip8::zeroOp()
@@ -781,3 +781,37 @@ void Chip8::XXXX()
 {
     std::cout << "Unknown Opcode: " << std::hex << opcode << std::endl;
 }
+
+////////////
+///SCHIP8 OPCODE FUNCTION IMPLEMENTATION
+////////////
+
+//00BN: Scroll display N lines up. 
+void SCUN();    
+
+//00CN: Scroll display N lines down.
+void SCDN();    
+
+//00FB: Scroll display 4 pixels to the right.
+void SCR();
+
+//00FC: Scroll display 4 pixels to the left. 
+void SCL();     
+
+//00FD: Exit the interpreter.
+void EXIT();    
+
+//00FE: Enable low res (64x32) mode.
+void LOW();
+
+//00FF: Enable high res (128x64) mode.
+void HIGH();    
+
+//FX30: Set I to the address of the SCHIP-8 16x10 font sprite representing the value in VX. 
+void LDISC();     
+
+//FX75: Store V0 through VX to HP-48 RPL user flags (X <= 7).
+void LDRVX();
+
+//FX85: Read V0 through VX to HP-48 RPL user flags (X <= 7).
+void LDVXR();

@@ -81,7 +81,7 @@ private:
     enum childFuncOffset getOffset();
 
     ///////////////////////
-    ///OPCODE FUNCTION DECLARATIONS
+    ///ORIGINAL CHIP8 OPCODE FUNCTION DECLARATIONS
     ///////////////////////
 
     void zeroOp();  void CLS();     void RET();
@@ -97,6 +97,15 @@ private:
     void LDXK();    void LDDTX();   void LDSTX();      
     void ADDIX();   void LDFX();    void LDBX();
     void LDIX();    void LDXI();    void XXXX();
+
+    ///////////////////////
+    ///SUPER CHIP8 OPCODE FUNCTION DECLARATIONS
+    ///////////////////////
+
+    void SCUN();    void SCDN();    void SCR();
+    void SCL();     void EXIT();    void LOW();
+    void HIGH();    void LDISC();     void LDRVX();
+    void LDVXR();
 
     ///////////////////////
     ///PRIVATE MEMBER VARIABLES
