@@ -761,7 +761,7 @@ void Chip8::LDIX()
     {
         memory[I + mempos] = V[mempos];
     }
-    I += ((opcode & 0x0F00) >> 8) + 1;
+    //I += ((opcode & 0x0F00) >> 8) + 1;
     pc += 2;
 }
 
@@ -772,7 +772,7 @@ void Chip8::LDXI()
     {
         V[mempos] = memory[I + mempos];
     }
-    I += ((opcode & 0x0F00) >> 8) + 1;
+    //I += ((opcode & 0x0F00) >> 8) + 1;
     pc += 2;
 }
 
