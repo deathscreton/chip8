@@ -39,6 +39,7 @@ public:
 
     bool drawFlag;                                     //Determines if something was written to the display buffer and needs to be pushed.
     bool playSound;                                    //Determines if the beep sound is ready to play. 
+    bool quitFlag;                                     //Determines if the program/interpreter requested the application to quit. Currently closes application, but may change it to reset instead. 
 
     char unsigned gfx[64][32]{0,0};                    //Screen buffer, 2048 pixels total. Switched to a 2D array, last buffer used 1D array with a 64 multiple offset for the y value.
     char unsigned key[16]{0};                          //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
@@ -104,7 +105,7 @@ private:
 
     void SCUN();    void SCDN();    void SCR();
     void SCL();     void EXIT();    void LOW();
-    void HIGH();    void LDISC();     void LDRVX();
+    void HIGH();    void LDISC();   void LDRVX();
     void LDVXR();
 
     ///////////////////////
@@ -116,6 +117,7 @@ private:
     short unsigned openArg;                         //Object member that stores argc values.
 
     char unsigned V[16];                            //registers from V0 to VF, with VF being used for flags
+    char unsigned RPL_FLAGS[7];                     //RPL Flags used by SCHIP games. 
 
     short unsigned I = 0;                           //Address Register used as an index to keep track of placement in memory.
     short unsigned pc = 0;                          //Program Counter used to keep track of where we are in the memory.
@@ -129,6 +131,8 @@ private:
     char unsigned soundTimer = 0;                   //Sound variable. Counts down at 60 Hz. Rings at non-zero.
 
     std::string romName;                            //String variable that carries the current ROM in memory.
+
+    int unsigned const FONT_OFFSET = 80;            //Offset for SCHIP8 Fontset.
 
 }; //Class Chip8
 

@@ -27,6 +27,26 @@ char unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five 
     0xF0, 0x80, 0xF0, 0x80, 0x80    // F
 };
 
+char unsigned fontset10[80] =            //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. 
+{
+    0xC67C, 0xDECE, 0xF6D6, 0xC6E6, 0x007C, // 0
+    0x3010, 0x30F0, 0x3030, 0x3030, 0x00FC, // 1
+    0xCC78, 0x0CCC, 0x3018, 0xCC60, 0x00FC, // 2
+    0xCC78, 0x0C0C, 0x0C38, 0xCC0C, 0x0078, // 3
+    0x1C0C, 0x6C3C, 0xFECC, 0x0C0C, 0x001E, // 4
+    0xC0FC, 0xC0C0, 0x0CF8, 0xCC0C, 0x0078, // 5
+    0x6038, 0xC0C0, 0xCCF8, 0xCCCC, 0x0078, // 6
+    0xC6FE, 0x06C6, 0x180C, 0x3030, 0x0030, // 7
+    0xCC78, 0xECCC, 0xDC78, 0xCCCC, 0x0078, // 8
+    0xC67C, 0xC6C6, 0x0C7E, 0x3018, 0x0070, // 9
+    0x7830, 0xCCCC, 0xFCCC, 0xCCCC, 0x00CC, // A
+    0x66FC, 0x6666, 0x667C, 0x6666, 0x00FC, // B
+    0x663C, 0xC0C6, 0xC0C0, 0x66C6, 0x003C, // C
+    0x6CF8, 0x6666, 0x6666, 0x6C66, 0x00F8, // D
+    0x62FE, 0x6460, 0x647C, 0x6260, 0x00FE, // E
+    0x66FE, 0x6462, 0x647C, 0x6060, 0x00F0  // F
+};
+
 
 Chip8::Chip8()
 {
@@ -79,9 +99,13 @@ Chip8::Chip8()
     for (int x = 0; x < 4096; x++)
         memory[x] = 0;
 
-    //fill memory with fontset
+    //fill memory with chip8 fontset
     for (int x = 0; x < 80; x++)
         memory[x] = fontset[x];
+
+    //fill memory with schip8 fontset
+    for (int x = 0; x < 80; x++)
+        memory[x + FONT_OFFSET] = fontset10[x];
 
     //nulls the stack
     for (int x = 0; x < 16; x++)
@@ -93,6 +117,7 @@ Chip8::Chip8()
 
     playSound = false;
     drawFlag = true;
+    quitFlag = false;
 }
 
 Chip8::~Chip8()
@@ -587,7 +612,7 @@ void Chip8::RNDXB()
     pc += 2;
 }
 
-//Dxyn: Display n-byte sprite starting at amemory location I at (Vx, Vy), set VF = collision.
+//Dxyn: Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
 void Chip8::DRWXY()
 {
     short unsigned x = V[(opcode & 0x0F00) >> 8];
@@ -740,7 +765,7 @@ void Chip8::ADDIX()
 //Fx29: Set I= location of sprite for digit Vx.
 void Chip8::LDFX()
 {
-    I = V[(opcode & 0x0F00) >> 8] * 0x5;//each character is five pixels wide; multiply the result by five so the memory for the font isn't overwritten
+    I = V[(opcode & 0x0F00) >> 8] * 0x5; //each character is five bytes wide; multiply the result by five so the memory for the font isn't overwritten
     pc += 2;
 }
 
@@ -787,31 +812,72 @@ void Chip8::XXXX()
 ////////////
 
 //00BN: Scroll display N lines up. 
-void SCUN();    
+void Chip8::SCUN()
+{
+
+}
 
 //00CN: Scroll display N lines down.
-void SCDN();    
+void Chip8::SCDN()
+{
+
+}
 
 //00FB: Scroll display 4 pixels to the right.
-void SCR();
+void Chip8::SCR()
+{
+
+}
 
 //00FC: Scroll display 4 pixels to the left. 
-void SCL();     
+void Chip8::SCL()
+{
+
+}
 
 //00FD: Exit the interpreter.
-void EXIT();    
+void Chip8::EXIT()
+{
+    quitFlag = true;
+}
 
 //00FE: Enable low res (64x32) mode.
-void LOW();
+void Chip8::LOW()
+{
+
+}
 
 //00FF: Enable high res (128x64) mode.
-void HIGH();    
+void Chip8::HIGH()
+{
+
+}
 
 //FX30: Set I to the address of the SCHIP-8 16x10 font sprite representing the value in VX. 
-void LDISC();     
+void Chip8::LDISC()
+{
+    I = (V[(opcode & 0x0F00) >> 8] * 0xA) + FONT_OFFSET; //Each character is ten bytes wide; multiply the result by ten so the memory for the font isn't overwritten
+    pc += 2;
+}
 
 //FX75: Store V0 through VX to HP-48 RPL user flags (X <= 7).
-void LDRVX();
+void Chip8::LDRVX()
+{
+    for (int mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
+    {
+        RPL_FLAGS[mempos] = V[mempos];
+    }
+    //I += ((opcode & 0x0F00) >> 8) + 1;
+    pc += 2;
+}
 
-//FX85: Read V0 through VX to HP-48 RPL user flags (X <= 7).
-void LDVXR();
+//FX85: Read V0 through VX from HP-48 RPL user flags (X <= 7).
+void Chip8::LDVXR()
+{
+    for (int mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
+    {
+        V[mempos] = RPL_FLAGS[mempos];
+    }
+    //I += ((opcode & 0x0F00) >> 8) + 1;
+    pc += 2;
+}
