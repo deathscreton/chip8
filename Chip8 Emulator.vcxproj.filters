@@ -26,10 +26,10 @@
     <ClInclude Include="include\Chip8.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Init.hpp">
+    <ClInclude Include="include\Init.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KeyHandler.hpp">
+    <ClInclude Include="include\KeyHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

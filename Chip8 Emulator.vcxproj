@@ -152,8 +152,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Chip8.hpp" />
-    <ClInclude Include="Init.hpp" />
-    <ClInclude Include="KeyHandler.hpp" />
+    <ClInclude Include="include\Init.hpp" />
+    <ClInclude Include="include\KeyHandler.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
