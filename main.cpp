@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
     //OBJECT INITIALIZATION//
 
     Chip8 chip8; //Creates emulator object and initializes class state using constructor
-    Display display(Chip8 &chip8);
+    Display display(chip8);
     sf::Event event; //Creates event object to contain event types necessary for interactivity.
     sf::SoundBuffer beepBuffer; //Creates sound buffer to hold beep.wav file.
     sf::Sound beepSound; //Creates sound object to control buffer playback.

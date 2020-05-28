@@ -1,8 +1,14 @@
 #include "Display.hpp"
 
-Display::Display()
+Display::Display() //default constructor
 {
-		chip.connectDisplay(this);
+
+}
+
+Display::Display(Chip8 &tempchip) //constructor overload that takes a chip8 object
+{
+	chip = &tempchip;
+	chip->connectDisplay(this);
 }
 
 Display::~Display()

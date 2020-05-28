@@ -16,8 +16,6 @@ public:
     //PUBLIC METHODS
     ///////////////////////
 
-   
-
     //Constructor
     Chip8();
 
