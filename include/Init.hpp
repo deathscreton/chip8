@@ -1,16 +1,6 @@
 #ifndef INIT_HPP
 #define INIT_HPP
 
-#include <iostream>
-#include <cstring>
-#include <string>
-
-#include "SFML\Graphics.hpp"
-#include "SFML\Window\Keyboard.hpp"
-#include "SFML\Audio.hpp"
-
-#include "Chip8.hpp"
-
 //Chunk of code responsible for resolving "unresolved external symbol __iob_func linker" errors. 
 //Had to include legacy_stdio_definitions.lib as well. Will debug this later. 
 #define stdin  (__acrt_iob_func(0))

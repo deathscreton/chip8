@@ -1,19 +1,30 @@
 #ifndef CHIP8_HPP
 #define CHIP8_HPP
 
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <cstdlib>
+#include <vector>
+
+class Display;
+
 class Chip8
 {
 public:
-    
     ///////////////////////
     //PUBLIC METHODS
     ///////////////////////
+
+   
 
     //Constructor
     Chip8();
 
     //Destructor
     ~Chip8();
+
+    void connectDisplay(Display* n);
 
     //Function responsible for loading program into memory.
     bool loadROM();
@@ -39,12 +50,15 @@ public:
 
     bool drawFlag;                                     //Determines if something was written to the display buffer and needs to be pushed.
     bool playSound;                                    //Determines if the beep sound is ready to play. 
-    bool quitFlag;                                     //Determines if the program/interpreter requested the application to quit. Currently closes application, but may change it to reset instead. 
+    bool quitFlag;                                     //Determines if the program/interpreter requested the application to quit. Currently closes application, but may change it to reset instead.
+    bool superFlag;                                    //Determines if the system should use highres or low. 
 
     char unsigned gfx[64][32]{0,0};                    //Screen buffer, 2048 pixels total. Switched to a 2D array, last buffer used 1D array with a 64 multiple offset for the y value.
     char unsigned key[16]{0};                          //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
 
 private:
+
+    Display* p_display = nullptr;
 
     /*Used as a typedef for opFunc and stores data passed to it by the initializer list in vector 'parentFuncTable'.*/
     struct opFunc

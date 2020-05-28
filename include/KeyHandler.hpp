@@ -1,6 +1,7 @@
 #ifndef KEYHANDLER_HPP
 #define KEYHANDLER_HPP
 
+#include "Chip8.hpp"
 #include "Init.hpp"
 
 void keyStateReleased(Chip8& chip8, sf::Event& keyState)
