@@ -147,11 +147,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bus.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Chip8.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Bus.hpp" />
     <ClInclude Include="include\Chip8.hpp" />
     <ClInclude Include="include\Display.hpp" />
     <ClInclude Include="include\Init.hpp" />

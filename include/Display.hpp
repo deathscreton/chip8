@@ -3,14 +3,11 @@
 
 //class Chip8;
 
-#include "Chip8.hpp"
-
 class Display
 {
 public:
 
 	Display();
-	Display(Chip8 &tempchip);
 	~Display();
 
 	void set_HiRes();
@@ -18,7 +15,7 @@ public:
 
 private:
 	
-	Chip8* chip = nullptr;
+
 	
 };
 

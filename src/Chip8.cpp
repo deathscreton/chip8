@@ -1,5 +1,5 @@
 #include "Chip8.hpp"
-#include "Display.hpp"
+#include "Bus.hpp"
 
 
 char unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five bytes.
@@ -122,9 +122,9 @@ Chip8::~Chip8()
 
 }
 
-void Chip8::connectDisplay(Display* n)
+void Chip8::connectBus(Bus* n)
 {
-    p_display = n;
+    p_bus = n;
 }
 
 void Chip8::softReset()
@@ -896,14 +896,14 @@ void Chip8::EXIT()
 void Chip8::LOW()
 {
     superFlag = false;
-    p_display->set_LoRes();
+    //p_display->set_LoRes();
 }
 
 //00FF: Enable high res (128x64) mode.
 void Chip8::HIGH()
 {
     superFlag = true;
-    p_display->set_HiRes();
+    //p_display->set_HiRes();
 }
 
 //FX30: Set I to the address of the SCHIP-8 16x10 font sprite representing the value in VX. 

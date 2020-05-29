@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <vector>
 
-class Display;
+class Bus;
 
 class Chip8
 {
@@ -22,7 +22,7 @@ public:
     //Destructor
     ~Chip8();
 
-    void connectDisplay(Display* n);
+    void connectBus(Bus* n);
 
     //Function responsible for loading program into memory.
     bool loadROM();
@@ -56,7 +56,7 @@ public:
 
 private:
 
-    Display* p_display = nullptr;
+    Bus* p_bus = nullptr;
 
     /*Used as a typedef for opFunc and stores data passed to it by the initializer list in vector 'parentFuncTable'.*/
     struct opFunc

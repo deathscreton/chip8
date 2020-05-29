@@ -9,7 +9,7 @@
 #include "Chip8.hpp"
 #include "Init.hpp"
 #include "KeyHandler.hpp"
-#include "Display.hpp"
+
 
 void pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect) //Fills the SFML window buffer with the gfx buffer from the chip8 then draws it to the screen.
 {
@@ -81,7 +81,6 @@ int main(int argc, char* argv[])
     //OBJECT INITIALIZATION//
 
     Chip8 chip8; //Creates emulator object and initializes class state using constructor
-    Display display(chip8);
     sf::Event event; //Creates event object to contain event types necessary for interactivity.
     sf::SoundBuffer beepBuffer; //Creates sound buffer to hold beep.wav file.
     sf::Sound beepSound; //Creates sound object to control buffer playback.
