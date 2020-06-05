@@ -15,7 +15,7 @@ extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
 
 namespace
 {
-    constexpr float SCALE_FACTOR = 12.5f; //ratio between resolutions 64x32 and 800x600
+    float SCALE_FACTOR = 12.5f; //ratio between resolutions 64x32 and 800x600. Changes to 6.25 if SuperFlag is set.
 }
 
 //MAIN VARIABLE END//

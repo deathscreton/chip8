@@ -1,6 +1,4 @@
 #include "Chip8.hpp"
-#include "Bus.hpp"
-
 
 char unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five bytes.
 {
@@ -115,16 +113,12 @@ Chip8::Chip8()
     playSound = false;
     drawFlag = true;
     quitFlag = false;
+    superFlag = false;
 }
 
 Chip8::~Chip8()
 {
 
-}
-
-void Chip8::connectBus(Bus* n)
-{
-    p_bus = n;
 }
 
 void Chip8::softReset()
@@ -195,6 +189,7 @@ void Chip8::hardReset()
         key[x] = 0;
 
     drawFlag = true;
+    superFlag = false;
 
     std::cout << "Enter the absolute ROM file path(extension included): \n";
     getline(std::cin, romName);
@@ -332,27 +327,6 @@ enum Chip8::childFuncOffset Chip8::getOffset()
     }
 }
 
-#ifdef _DEBUG
-//Draws graphics buffer 'gfx[x][y]' to the console.
-void Chip8::debugRender()
-{
-
-    for (int y = 0; y < 32; ++y)
-    {
-        for (int x = 0; x < 64; ++x)
-        {
-            if (gfx[x][y] == 0)
-                printf(" ");
-            else
-                printf("O");
-        }
-        printf("\n");
-    }
-    printf("\n");
-
-}
-#endif // _DEBUG
-
 bool Chip8::setOpenParams(const int argc, const char* rom)
 {
     //Check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
@@ -373,6 +347,35 @@ bool Chip8::setOpenParams(const int argc, const char* rom)
         return false;
     }
 }
+
+//Method used to return values for x and y for the gfx buffer. 
+auto Chip8::get_GfxRange()
+{
+    return Chip8::range;
+}
+
+
+#ifdef _DEBUG
+//Draws graphics buffer 'gfx[x][y]' to the console.
+void Chip8::debugRender()
+{
+    auto [x_range, y_range] = Chip8::get_GfxRange();
+
+    for (int y = 0; y < y_range; ++y)
+    {
+        for (int x = 0; x < x_range; ++x)
+        {
+            if (gfx[x][y] == 0)
+                printf(" ");
+            else
+                printf("O");
+        }
+        printf("\n");
+    }
+    printf("\n");
+
+}
+#endif // _DEBUG
 
 ////////////
 ///CHIP8 OPCODE FUNCTION IMPLEMENTATION
@@ -614,80 +617,34 @@ void Chip8::RNDXB()
     pc += 2;
 }
 
-//Dxyn: Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+//Dxyn: Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision. If n=0 and superflag = 1, draw a 16x16 sprite.
 void Chip8::DRWXY()
 {
     short unsigned x = V[(opcode & 0x0F00) >> 8];
     short unsigned y = V[(opcode & 0x00F0) >> 4];
     short unsigned height = opcode & 0x000F;//maximum row amount, aka, pixel height
     short unsigned pixel;
+    short unsigned bits = 8;
+
+    V[0xF] = 0;//sets flag register to zero. necessary for correct collision detection.
     
-    if (height != 0 and !superFlag)
+    if (height == 0 and superFlag) height = 16; bits = 16; //checks if schip8 draw function is necessary, otherwise, 
+
+    for (int yline = 0; yline < height; yline++)//loop for however many rows there are which is determined by 'height'
     {
-        V[0xF] = 0;//sets flag register to zero. necessary for correct collision detection.
+        pixel = memory[I + yline];//grab the byte from memory and store it in the variable 'pixel'. each bit in this byte is a set value for a pixel to be drawn.
 
-        for (int yline = 0; yline < height; yline++)//loop for however many rows there are which is determined by 'height'
+        for (int xline = 0; xline < bits; xline++)//loop for all eight bits, sixteen if using schip8 draw function
         {
-            pixel = memory[I + yline];//grab the byte from memory and store it in the variable 'pixel'. each bit in this byte is a set value for a pixel to be drawn.
-
-            for (int xline = 0; xline < 8; xline++)//loop for all eight bits
+            if ((pixel & (0x80 >> xline)) != 0)//scans the bits one at a time. if the current bit is 1, then it needs to be checked for collision. shifts bits to the right based on loop iteration.
             {
-                if ((pixel & (0x80 >> xline)) != 0)//scans the bits one at a time. if the current bit is 1, then it needs to be checked for collision. shifts bits to the right based on loop iteration.
-                {
-                    if (gfx[x + xline][y + yline] == 1)//checks if the bit on the screen is set. if it is, set VF to 1. used for collision.
-                    {
-                        V[0xF] = 1;//set flag register to one for collision
-                    }
-                    gfx[x + xline][y + yline] ^= 1;
-                }
+               if (gfx[x + xline][y + yline] == 1)//checks if the bit on the screen is set. if it is, set VF to 1. used for collision.
+               {
+                  V[0xF] = 1;//set flag register to one for collision
+               }
+               gfx[x + xline][y + yline] ^= 1;
             }
         }
-    }
-    else if (height != 0 and superFlag)
-    {
-        V[0xF] = 0;//sets flag register to zero. necessary for correct collision detection.
-
-        for (int yline = 0; yline < height; yline++)//loop for however many rows there are which is determined by 'height'
-        {
-            pixel = memory[I + yline];//grab the byte from memory and store it in the variable 'pixel'. each bit in this byte is a set value for a pixel to be drawn.
-
-            for (int xline = 0; xline < 16; xline++)//loop for all eight bits
-            {
-                if ((pixel & (0x80 >> xline)) != 0)//scans the bits one at a time. if the current bit is 1, then it needs to be checked for collision. shifts bits to the right based on loop iteration.
-                {
-                    if (gfx[x + xline][y + yline] == 1)//checks if the bit on the screen is set. if it is, set VF to 1. used for collision.
-                    {
-                        V[0xF] = 1;//set flag register to one for collision
-                    }
-                    gfx[x + xline][y + yline] ^= 1;
-                }
-            }
-        }
-    }
-    else if (height == 0 and superFlag)
-    {
-        V[0xF] = 0;//sets flag register to zero. necessary for correct collision detection.
-
-        for (int yline = 0; yline < 16; yline++)//loop for however many rows there are which is determined by 'height'
-        {
-            pixel = memory[I + yline];//grab the byte from memory and store it in the variable 'pixel'. each bit in this byte is a set value for a pixel to be drawn.
-
-            for (int xline = 0; xline < 16; xline++)//loop for all eight bits
-            {
-                if ((pixel & (0x80 >> xline)) != 0)//scans the bits one at a time. if the current bit is 1, then it needs to be checked for collision. shifts bits to the right based on loop iteration.
-                {
-                    if (gfx[x + xline][y + yline] == 1)//checks if the bit on the screen is set. if it is, set VF to 1. used for collision.
-                    {
-                        V[0xF] = 1;//set flag register to one for collision
-                    }
-                    gfx[x + xline][y + yline] ^= 1;
-                }
-            }
-        }
-    }
-    else
-    {
-        std::cerr << "Something has gone wrong when drawing the contents to the screen. /n Height: " << height << " /n SuperFlag: " << superFlag << std::endl;
     }
     drawFlag = true;
     pc += 2;
@@ -896,14 +853,14 @@ void Chip8::EXIT()
 void Chip8::LOW()
 {
     superFlag = false;
-    //p_display->set_LoRes();
+    Chip8::range = {64, 32};
 }
 
 //00FF: Enable high res (128x64) mode.
 void Chip8::HIGH()
 {
     superFlag = true;
-    //p_display->set_HiRes();
+    Chip8::range = {128, 64};
 }
 
 //FX30: Set I to the address of the SCHIP-8 16x10 font sprite representing the value in VX. 

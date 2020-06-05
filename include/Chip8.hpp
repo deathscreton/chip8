@@ -7,8 +7,6 @@
 #include <cstdlib>
 #include <vector>
 
-class Bus;
-
 class Chip8
 {
 public:
@@ -21,8 +19,6 @@ public:
 
     //Destructor
     ~Chip8();
-
-    void connectBus(Bus* n);
 
     //Function responsible for loading program into memory.
     bool loadROM();
@@ -39,6 +35,9 @@ public:
     //Resets program and clears ALL memory. Reruns loadRom function. 
     void hardReset();
 
+    //Method used to return values for x and y for the gfx buffer. 
+    auto get_GfxRange();
+
     //Method responsible for setting chip8 opening variables from argc and argv. 
     bool setOpenParams(const int argc, const char* rom);
 
@@ -51,12 +50,10 @@ public:
     bool quitFlag;                                     //Determines if the program/interpreter requested the application to quit. Currently closes application, but may change it to reset instead.
     bool superFlag;                                    //Determines if the system should use highres or low. 
 
-    char unsigned gfx[64][32]{0,0};                    //Screen buffer, 2048 pixels total. Switched to a 2D array, last buffer used 1D array with a 64 multiple offset for the y value.
+    char unsigned gfx[128][64]{0,0};                   //Screen buffer. Uses extended buffer range for both CHIP8 and SCHIP roms.
     char unsigned key[16]{0};                          //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
 
 private:
-
-    Bus* p_bus = nullptr;
 
     /*Used as a typedef for opFunc and stores data passed to it by the initializer list in vector 'parentFuncTable'.*/
     struct opFunc
@@ -143,6 +140,12 @@ private:
     char unsigned soundTimer = 0;                   //Sound variable. Counts down at 60 Hz. Rings at non-zero.
 
     std::string romName;                            //String variable that carries the current ROM in memory.
+
+    struct gfx_range                                //Struct that contains the x and y value for the gfx buffer. 
+    {
+        int x = 0;                                  //Stores maximum element amount for x value in the gfx buffer. Can have values of 64 (low res) and 128 (high res).
+        int y = 0;                                  //Stores maximum element amount for y value in the gfx buffer. Can have values of 32 (low res) and 64 (high res).
+    } range;
 
     int unsigned const FONT_OFFSET = 80;            //Offset for SCHIP8 Fontset.
 

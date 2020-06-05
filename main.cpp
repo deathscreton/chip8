@@ -13,11 +13,13 @@
 
 void pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect) //Fills the SFML window buffer with the gfx buffer from the chip8 then draws it to the screen.
 {
-    for (int y = 0; y < 32; ++y)
+    auto [x_range, y_range] = chip8.get_GfxRange();
+
+    for (int y = 0; y < y_range; ++y)
     {
-        for (int x = 0; x < 64; ++x)
+        for (int x = 0; x < x_range; ++x)
         {
-            if (chip8.gfx[x][y] == 1) chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR); //Multiply the position value by the scale factor 12.5 so nothing overlaps
+            if (chip8.gfx[x][y] == 1) chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR); //Multiply the position value by the scale factor so nothing overlaps
             
             mainWindow.draw(chip8SpriteRect);
         }
@@ -50,8 +52,17 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
 
         chip8.emulateCycle();
 
-        if (chip8.quitFlag)
-            mainWindow.close();
+        if (chip8.quitFlag) mainWindow.close();
+
+        if (chip8.superFlag)
+        {
+            SCALE_FACTOR = 6.25;
+        }
+        else
+        {
+            SCALE_FACTOR = 12.5;
+        }
+
 
         if (chip8.drawFlag)
         {
