@@ -2,6 +2,7 @@
 #define CHIP8_HPP
 
 #include <iostream>
+#include <array>
 #include <string>
 #include <fstream>
 #include <cstdlib>
@@ -45,13 +46,13 @@ public:
     ///PUBLIC MEMBER VARIABLES
     ///////////////////////
 
-    bool drawFlag;                                     //Determines if something was written to the display buffer and needs to be pushed.
-    bool playSound;                                    //Determines if the beep sound is ready to play. 
-    bool quitFlag;                                     //Determines if the program/interpreter requested the application to quit. Currently closes application, but may change it to reset instead.
-    bool superFlag;                                    //Determines if the system should use highres or low. 
+    bool drawFlag;                                              //Determines if something was written to the display buffer and needs to be pushed.
+    bool playSound;                                             //Determines if the beep sound is ready to play. 
+    bool quitFlag;                                              //Determines if the program/interpreter requested the application to quit. Currently closes application, but may change it to reset instead.
+    bool superFlag;                                             //Determines if the system should use highres or low. 
 
-    char unsigned gfx[128][64]{0,0};                   //Screen buffer. Uses extended buffer range for both CHIP8 and SCHIP roms.
-    char unsigned key[16]{0};                          //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
+    std::array<std::array<char, 64>, 128> gfx = { 0,0 };        //Screen buffer. Uses extended buffer range for both CHIP8 and SCHIP roms. 
+    char unsigned key[16]{ 0 };                                 //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
 
 private:
 
