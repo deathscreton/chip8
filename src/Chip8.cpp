@@ -834,7 +834,13 @@ void Chip8::SCDN()
 //00FB: Scroll display 4 pixels to the right.
 void Chip8::SCR()
 {
-
+    /* todo: This code should work like the following:
+        The goal is to imagine the buffer as a grid. 128 across, 64 down (or 64x32). The entire grid has to essentially SHIFT all data
+        to the RIGHT 4 columns. Assume array[0][0-63]. These 64 elements all contain a 1. We have to move the values in these elements
+        4 spaces to the right on the grid so all contiguous data fills in all memeory spots starting at element 4 and up. This means 
+        that you have to ignore and overwrite the last 4 columns of the 128 column grid and fill in (zero fill?) the first 4
+        columns of the grid. Do the opposite for scrolling left. 
+    */
 }
 
 //00FC: Scroll display 4 pixels to the left. 
