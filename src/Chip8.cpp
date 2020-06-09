@@ -86,8 +86,8 @@ Chip8::Chip8()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < 64; x++)
-        for (int y = 0; y < 32; y++)
+    for (int x = 0; x < 128; x++)
+        for (int y = 0; y < 64; y++)
             gfx[x][y] = 0;
 
     //nulls memory for initialization
@@ -114,6 +114,10 @@ Chip8::Chip8()
     drawFlag = true;
     quitFlag = false;
     superFlag = false;
+
+#ifdef _DEBUG
+    std::cout << "gfx buffer is " << sizeof(gfx) << " bytes big." << std::endl;
+#endif //!_DEBUG
 }
 
 Chip8::~Chip8()
@@ -131,8 +135,8 @@ void Chip8::softReset()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < 64; x++)
-        for (int y = 0; y < 32; y++)
+    for (int x = 0; x < 128; x++)
+        for (int y = 0; y < 64; y++)
             gfx[x][y] = 0;
 
     //nulls the stack
@@ -841,12 +845,16 @@ void Chip8::SCR()
         that you have to ignore and overwrite the last 4 columns of the 128 column grid and fill in (zero fill?) the first 4
         columns of the grid. Do the opposite for scrolling left. 
     */
+    memmove(gfx.data() + 4, gfx.data(), sizeof(gfx) );
+#ifdef _DEBUG
+    std::cout << "gfx is " << sizeof(gfx) << " bytes big." << std::endl;
+#endif //!_DEBUG
 }
 
 //00FC: Scroll display 4 pixels to the left. 
 void Chip8::SCL()
 {
-
+   //memmove(gfx.data(), gfx.data() + 4)
 }
 
 //00FD: Exit the interpreter.
