@@ -51,7 +51,7 @@ public:
     bool quitFlag;                                              //Determines if the program/interpreter requested the application to quit. Currently closes application, but may change it to reset instead.
     bool superFlag;                                             //Determines if the system should use highres or low. 
 
-    std::array<std::array<char, 64>, 128> gfx = { 0,0 };        //Screen buffer. Uses extended buffer range for both CHIP8 and SCHIP roms. 
+    std::array<std::array<char, 64>, 128> gfx = { 0,0 };        //Screen buffer. Uses extended buffer range for both CHIP8 and SCHIP roms. Using std container for array to make use of container members. 
     char unsigned key[16]{ 0 };                                 //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
 
 private:

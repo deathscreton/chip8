@@ -632,7 +632,7 @@ void Chip8::DRWXY()
 
     V[0xF] = 0;//sets flag register to zero. necessary for correct collision detection.
     
-    if (height == 0 and superFlag) height = 16; bits = 16; //checks if schip8 draw function is necessary, otherwise, 
+    if (height == 0 and superFlag) { height = 16; bits = 16; } //checks if schip8 draw function is necessary, otherwise, 
 
     for (int yline = 0; yline < height; yline++)//loop for however many rows there are which is determined by 'height'
     {
@@ -826,7 +826,7 @@ void Chip8::XXXX()
 //00BN: Scroll display N lines up. 
 void Chip8::SCUN()
 {
-
+    //This instruction is for XO-Chip extension compatibility. May implement at a later date. 
 }
 
 //00CN: Scroll display N lines down.
@@ -838,23 +838,24 @@ void Chip8::SCDN()
 //00FB: Scroll display 4 pixels to the right.
 void Chip8::SCR()
 {
-    /* todo: This code should work like the following:
-        The goal is to imagine the buffer as a grid. 128 across, 64 down (or 64x32). The entire grid has to essentially SHIFT all data
-        to the RIGHT 4 columns. Assume array[0][0-63]. These 64 elements all contain a 1. We have to move the values in these elements
-        4 spaces to the right on the grid so all contiguous data fills in all memeory spots starting at element 4 and up. This means 
-        that you have to ignore and overwrite the last 4 columns of the 128 column grid and fill in (zero fill?) the first 4
-        columns of the grid. Do the opposite for scrolling left. 
+    /*  This code should work like the following:
+        The goal is to imagine the buffer as a grid. 128 across, 64 down (or 64x32 in lowres). The entire grid has to essentially SHIFT all data
+        to the RIGHT 4 columns. Assume array[0][0-63]. These 64 'y' elements all contain a 1. We have to move the values in these elements
+        4 spaces to the right on the grid so all contiguous data fills in all memeory spots starting at element 4 and up to the end of the array. 
+        This means that you have to ignore and overwrite the last 4 columns of the 128 column grid and fill in (zero fill?) the first 4
+        columns of the grid. This is done automatically when using memmove as it overwrites the first four columns when the destination
+        argument is the start of the array. It does not however, do this when scrolling left, as the last four columns are not overwritten
+        due to the size of the gfx array being reduced by 4 in order to avoid junk data outside of the array, so that portion of the array will need
+        to be filled manually. 
     */
-    memmove(gfx.data() + 4, gfx.data(), sizeof(gfx) );
-#ifdef _DEBUG
-    std::cout << "gfx is " << sizeof(gfx) << " bytes big." << std::endl;
-#endif //!_DEBUG
+    memmove(gfx.data() + 4, gfx.data(), sizeof(gfx)); 
 }
 
 //00FC: Scroll display 4 pixels to the left. 
 void Chip8::SCL()
 {
-   //memmove(gfx.data(), gfx.data() + 4)
+    memmove(gfx.data(), gfx.data() + 4, sizeof(gfx) - 4);
+    memset(gfx.end - 4, 0, 4);
 }
 
 //00FD: Exit the interpreter.
@@ -891,7 +892,7 @@ void Chip8::LDRVX()
     {
         RPL_FLAGS[mempos] = V[mempos];
     }
-    //I += ((opcode & 0x0F00) >> 8) + 1;
+    //I += ((opcode & 0x0F00) >> 8) + 1; //This is an old portion of this instruction from SCHIP 1.0 that was removed in 1.1. It's not needed in normal cases. 
     pc += 2;
 }
 
@@ -902,6 +903,6 @@ void Chip8::LDVXR()
     {
         V[mempos] = RPL_FLAGS[mempos];
     }
-    //I += ((opcode & 0x0F00) >> 8) + 1;
+    //I += ((opcode & 0x0F00) >> 8) + 1; //This is an old portion of this instruction from SCHIP 1.0 that was removed in 1.1. It's not needed in normal cases. 
     pc += 2;
 }
