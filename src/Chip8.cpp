@@ -76,7 +76,7 @@ Chip8::Chip8()
 
     //std::cout << "Constructor initializing..." << std::endl;
 
-    
+    Chip8::LOW(); //set resolution to lowres.
 
     pc = 0x200;//0x200 == 512
     I = 0;
@@ -86,8 +86,8 @@ Chip8::Chip8()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < 128; x++)
-        for (int y = 0; y < 64; y++)
+    for (int x = 0; x < range.x; x++)
+        for (int y = 0; y < range.y; y++)
             gfx[x][y] = 0;
 
     //nulls memory for initialization
@@ -127,6 +127,8 @@ Chip8::~Chip8()
 
 void Chip8::softReset()
 {
+    Chip8::LOW();
+
     pc = 0x200;//0x200 == 512
     I = 0;
     opcode = 0;
@@ -135,8 +137,8 @@ void Chip8::softReset()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < 128; x++)
-        for (int y = 0; y < 64; y++)
+    for (int x = 0; x < range.x; x++)
+        for (int y = 0; y < range.y; y++)
             gfx[x][y] = 0;
 
     //nulls the stack
@@ -160,6 +162,9 @@ void Chip8::softReset()
 
 void Chip8::hardReset()
 {
+
+    Chip8::LOW();
+
     pc = 0x200;//0x200 == 512
     I = 0;
     opcode = 0;
@@ -168,8 +173,8 @@ void Chip8::hardReset()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < 64; x++)
-        for (int y = 0; y < 32; y++)
+    for (int x = 0; x < range.x; x++)
+        for (int y = 0; y < range.y; y++)
             gfx[x][y] = 0;
 
     //nulls memory for initialization
@@ -400,9 +405,9 @@ void Chip8::zeroOp()
 //Clears the display buffer.
 void Chip8::CLS()
 {
-    for (int x = 0; x < 64; x++)
+    for (int x = 0; x < range.x; x++)
     {
-        for (int y = 0; y < 32; y++)
+        for (int y = 0; y < range.y; y++)
         {
             gfx[x][y] = 0;
         }
@@ -848,14 +853,19 @@ void Chip8::SCR()
         due to the size of the gfx array being reduced by 4 in order to avoid junk data outside of the array, so that portion of the array will need
         to be filled manually. 
     */
-    memmove(gfx.data() + 4, gfx.data(), sizeof(gfx)); 
+    for (int y = 0; y < range.y; y++)
+    {   auto yline = gfx.data() + range.x * y;
+        memmove(yline + 4, yline, sizeof(gfx) - 4);
+    }
+         
 }
 
 //00FC: Scroll display 4 pixels to the left. 
 void Chip8::SCL()
 {
-    memmove(gfx.data(), gfx.data() + 4, sizeof(gfx) - 4);
-    memset(gfx.end - 4, 0, 4);
+    //needs to be reimplemented
+    //memmove(gfx.data(), gfx.data() + 4, sizeof(gfx) - 4);
+    //memset(gfx.end - 4, 0, 4);
 }
 
 //00FD: Exit the interpreter.
