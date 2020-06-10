@@ -837,41 +837,81 @@ void Chip8::SCUN()
 //00CN: Scroll display N lines down.
 void Chip8::SCDN()
 {
+    int unsigned d_Scroll = opcode & 0x000F;
 
+    for (int loop = 0; loop < d_Scroll; loop++)
+    {
+
+    }
 }
 
 //00FB: Scroll display 4 pixels to the right.
 void Chip8::SCR()
 {
-    /*  This code should work like the following:
-        The goal is to imagine the buffer as a grid. 128 across, 64 down (or 64x32 in lowres). The entire grid has to essentially SHIFT all data
-        to the RIGHT 4 columns. Assume array[0][0-63]. These 64 'y' elements all contain a 1. We have to move the values in these elements
-        4 spaces to the right on the grid so all contiguous data fills in all memeory spots starting at element 4 and up to the end of the array. 
-        This means that you have to ignore and overwrite the last 4 columns of the 128 column grid and fill in (zero fill?) the first 4
-        columns of the grid. This is done automatically when using memmove as it overwrites the first four columns when the destination
-        argument is the start of the array. It does not however, do this when scrolling left, as the last four columns are not overwritten
-        due to the size of the gfx array being reduced by 4 in order to avoid junk data outside of the array, so that portion of the array will need
-        to be filled manually. 
+    /*  
+        The following code for SCR/L is terrible and should only be viewed as a logical example, and not a pratical one. I'll be changing this eventually, 
+        but I just wanted something that works and I believe this one does. The code is setup this way since I used a 2D std::array. 2D arrays 
+        store information in memory continguously, but does it in row order, ie. [row][column]. Row two follows row one, and row three follows row two. 
+        Because of this, you can't access bytes in y columns continguously, and must change the x element everytime you want to access a y element on
+        its own, ie. the y elements are fragmented.. The quickest fix I know of is to just swap the x and y coordinates in the 2D gfx array. 
+        This would require me rewriting multiple functions, and I was just lazy. So I'll chalk this up to a learning experience. 
+        When folks say 2D arrays are syntax poison, this is what they mean. This, with a 1D array, or the x/y coordinates swapped, could be done
+        in two to three lines of code without the need for a temp array, or multiple for loops. 
     */
-    for (int y = 0; y < range.y; y++)
-    {   auto yline = gfx.data() + range.x * y;
-        memmove(yline + 4, yline, sizeof(gfx) - 4);
+
+    std::array<char, 128> temparr = { 0 }; //temporary array to hold a single contiguous line of [y] elements. 
+
+    for (int y = 0; y < range.y; y++) //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
+    {   
+        auto yline = gfx.data() + y; //sets the address for the specific [y] element we need. 
+
+        for (int xcolumn = 0; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
+        {   
+            auto y_gfxOffset = yline + (range.y * xcolumn);                 //sets the address of the current [x] and [y] element in memory based on above loops. 
+            memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
+        }
+        for (int xcolumn = 4; xcolumn < range.x - 4; xcolumn++)
+        {
+            auto y_gfxOffset = yline + (range.y * xcolumn);
+            memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
+        }
+        for (int xcolumn = 0; xcolumn < 4; xcolumn++)
+        {
+            auto y_gfxOffset = yline + (range.y * xcolumn);
+            memset(y_gfxOffset, 0, 1);
+        }
     }
-         
+    pc += 2;
 }
 
 //00FC: Scroll display 4 pixels to the left. 
 void Chip8::SCL()
 {
-    //needs to be reimplemented
-    //memmove(gfx.data(), gfx.data() + 4, sizeof(gfx) - 4);
-    //memset(gfx.end - 4, 0, 4);
+    std::array<char, 128> temparr = { 0 }; //temporary array to hold a single contiguous line of [y] elements. 
+
+    for (int y = 0; y < range.y; y++) //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
+    {
+        auto yline = gfx.data() + y; //sets the address for the specific [y] element we need. 
+
+        for (int xcolumn = 4; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
+        {
+            auto y_gfxOffset = yline + (range.y * xcolumn);                 //sets the address of the current [x] and [y] element in memory based on above loops. 
+            memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
+        }
+        for (int xcolumn = 0; xcolumn < range.x; xcolumn++)
+        {
+            auto y_gfxOffset = yline + (range.y * xcolumn);
+            memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
+        }
+    }
+    pc += 2;
 }
 
 //00FD: Exit the interpreter.
 void Chip8::EXIT()
 {
     quitFlag = true;
+    pc += 2;
 }
 
 //00FE: Enable low res (64x32) mode.
@@ -879,6 +919,7 @@ void Chip8::LOW()
 {
     superFlag = false;
     Chip8::range = {64, 32};
+    pc += 2;
 }
 
 //00FF: Enable high res (128x64) mode.
@@ -886,6 +927,7 @@ void Chip8::HIGH()
 {
     superFlag = true;
     Chip8::range = {128, 64};
+    pc += 2;
 }
 
 //FX30: Set I to the address of the SCHIP-8 16x10 font sprite representing the value in VX. 
