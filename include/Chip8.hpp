@@ -37,7 +37,7 @@ public:
     void hardReset();
 
     //Method used to return values for x and y for the gfx buffer. 
-    auto get_GfxRange();
+    auto get_GfxRange() { return Chip8::range; }
 
     //Method responsible for setting chip8 opening variables from argc and argv. 
     bool setOpenParams(const int argc, const char* rom);
@@ -64,7 +64,7 @@ private:
     };
 
     //Defines the offset required to select the proper childOpcode based on the parentOpcode.
-    enum childFuncOffset { noOffset = 0, opCode8 = 2, opCodeE = 11, opCodeF = 13, } offset;
+    enum class childFuncOffset { noOffset = 0, opCode8 = 9, opCodeE = 18, opCodeF = 20, };
 
     //Stores intializer lists of type 'opFunc' that contain pointers to a certain function. 
     std::vector<opFunc> parentFuncTable;
@@ -86,10 +86,10 @@ private:
     bool isValidOp(const char &nibble);
 
     //Checks to see if a sound needs to be played. If so, returns true.
-    bool isSoundReady();
+    bool isSoundReady() { return soundTimer == 1; }
 
     //Function responsible for returning the offset value based on the child opcode function requested by the loNibble.
-    enum childFuncOffset getOffset();
+    enum class childFuncOffset getOffset();
 
     ///////////////////////
     ///ORIGINAL CHIP8 OPCODE FUNCTION DECLARATIONS

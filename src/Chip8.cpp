@@ -20,7 +20,7 @@ char unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five 
     0xF0, 0x80, 0xF0, 0x80, 0x80    // F
 };
 
-char unsigned fontset10[80] =            //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. 
+short int unsigned fontset10[80] =            //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. 
 {
     0xC67C, 0xDECE, 0xF6D6, 0xC6E6, 0x007C, // 0
     0x3010, 0x30F0, 0x3030, 0x3030, 0x00FC, // 1
@@ -40,13 +40,12 @@ char unsigned fontset10[80] =            //Fontset for SCHIP8, 0-F hex, each spr
     0x66FE, 0x6462, 0x647C, 0x6060, 0x00F0  // F
 };
 
-
 Chip8::Chip8()
 {
     //Using to cutdown on an already lenghty list.
     using a = Chip8;
     /*An initializer list that uses a vector of type opFunc to store another initializer lists for struct opFunc initializers. 
-    The hiNibble and loNibble variables are used to locate the required function pointer that will populate the */
+    The hiNibble and loNibble variables are used to locate the required function pointer that will populate the struct.*/
     parentFuncTable =
     {            //0//               //1//                      //2//
         {"zeroOp", &a::zeroOp}, {"JMP", &a::JMP},       {"CALL", &a::CALL},        
@@ -61,20 +60,21 @@ Chip8::Chip8()
     /*Initializer list that contains opcodes that can differ based on the parent opcode.*/
     childFuncTable =
     {       
-        {"CLS", &a::CLS},       {"RET", &a::RET},                                       //Offset 0: 00XX Opcodes
+        {"SCUN", &a::SCUN},     {"SCDN", &a::SCDN},    {"CLS", &a::CLS},                ////
+        {"RET", &a::RET},       {"SCR", &a::SCR},      {"SCL", &a::SCL},                //Offset 0: 00XX Opcodes
+        {"EXIT", &a::EXIT},     {"LOW", &a::LOW},      {"HIGH", &a::HIGH},              ////
 
         {"LDXY", &a::LDXY},     {"ORXY", &a::ORXY},    {"ANDXY", &a::ANDXY},            /////
-        {"XORXY", &a::XORXY},   {"ADDXY", &a::ADDXY},  {"SUBXY",&a::SUBXY},             //Offset 2: 8XXX Opcodes
+        {"XORXY", &a::XORXY},   {"ADDXY", &a::ADDXY},  {"SUBXY",&a::SUBXY},             //Offset 9: 8XXX Opcodes
         {"SHRX", &a::SHRX},     {"SUBNXY", &a::SUBNXY},{"SHLXY", &a::SHLXY},            /////
 
-        {"SKPX", &a::SKPX},     {"SKNPX", &a::SKNPX},                                   //Offset 11: EXXX Opcodes
+        {"SKPX", &a::SKPX},     {"SKNPX", &a::SKNPX},                                   //Offset 18: EXXX Opcodes
 
         {"LDXDT", &a::LDXDT},   {"LDXK", &a::LDXK},     {"LDDTX", &a::LDDTX},           /////
-        {"LDSTX", &a::LDSTX},   {"ADDIX", &a::ADDIX},   {"LDFX", &a::LDFX},             //Offset 13: FXXX Opcodes
+        {"LDSTX", &a::LDSTX},   {"ADDIX", &a::ADDIX},   {"LDFX", &a::LDFX},             //Offset 20: FXXX Opcodes
         {"LDBX", &a::LDBX},     {"LDIX", &a::LDIX},     {"LDXI", &a::LDXI},             /////
+        {"LDISC", &a::LDISC},   {"LDRVX", &a::LDRVX},   {"LDVXR", &a::LDVXR}
     };
-
-    
 
     //std::cout << "Constructor initializing..." << std::endl;
 
@@ -229,17 +229,13 @@ void Chip8::emulateCycle()
     }
 }
 
-//Checks to see if a sound needs to be played. If so, returns true.
-bool Chip8::isSoundReady()
+//Fetches and stores the Opcode in class variable 'opcode'; sets hi and lo nibble for usage in findFunc.
+void Chip8::fetch()
 {
-    if (soundTimer == 1)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    opcode = memory[pc] << 8 | memory[pc + 1];
+
+    hiNibble = (memory[pc] & 0xF0) >> 4;
+    loNibble = (memory[pc + 1]);
 }
 
 //Find the initial opcode function using the hiNibble. If isValidOP returns true, the nibble is passed to parentFuncTable to initiate the function. If false, it hands off the program to the catch-all function XXXX.
@@ -309,31 +305,22 @@ bool Chip8::loadROM()
     return true;
 }
 
-//Fetches and stores the Opcode in class variable 'opcode'; sets hi and lo nibble for usage in findFunc. Also sets the offset for child opcode functions in childFuncTable.
-void Chip8::fetch()
-{
-    opcode = memory[pc] << 8 | memory[pc + 1];
-
-    hiNibble = (memory[pc] & 0xF0) >> 4;
-    loNibble = (memory[pc + 1]);
-}
-
 //Supplies an offset for child opcodes that are derived from a parent opcode like 8XXX. This offset is used to determine which opcode function is ran from within vector childFuncTable. 
-enum Chip8::childFuncOffset Chip8::getOffset()
+enum class Chip8::childFuncOffset Chip8::getOffset()
 {
     switch (hiNibble)
     {
     case 0x8:
-        return opCode8;
+        return Chip8::childFuncOffset::opCode8;
         break;
     case 0xE:
-        return opCodeE;
+        return Chip8::childFuncOffset::opCodeE;
         break;
     case 0xF:
-        return opCodeF;
+        return Chip8::childFuncOffset::opCodeF;
         break;
     default:
-        return noOffset;
+        return Chip8::childFuncOffset::noOffset;
         break;
     }
 }
@@ -352,19 +339,10 @@ bool Chip8::setOpenParams(const int argc, const char* rom)
         romName = rom;
         return true;
     }
-    else
-    {
-        std::cerr << "Something went terribly wrong when collecting rom name." << std::endl;
-        return false;
-    }
-}
 
-//Method used to return values for x and y for the gfx buffer. 
-auto Chip8::get_GfxRange()
-{
-    return Chip8::range;
+    std::cerr << "Something went terribly wrong when collecting rom name." << std::endl;
+    return false;
 }
-
 
 #ifdef _DEBUG
 //Draws graphics buffer 'gfx[x][y]' to the console.
@@ -395,13 +373,45 @@ void Chip8::debugRender()
 //Uses the loNibble to determine between 00E0 and 00EE.
 void Chip8::zeroOp()
 {
-    offset = getOffset();
-
-    //Code to determine specific function within '0x00NN' opcode, where NN is either 'E0' or 'EE'.
-    if (loNibble == 0xE0)
-        (this->*childFuncTable[0].opCo)();
-    else
-        (this->*childFuncTable[1].opCo)();
+    switch (loNibble)
+    {
+    case 0xE0:
+        (this->*childFuncTable[2].opCo)();
+        break;
+    case 0xEE:
+        (this->*childFuncTable[3].opCo)();
+        break;
+    case 0xFB:
+        (this->*childFuncTable[4].opCo)();
+        break;
+    case 0xFC:
+        (this->*childFuncTable[5].opCo)();
+        break;
+    case 0xFD:
+        (this->*childFuncTable[6].opCo)();
+        break;
+    case 0xFE:
+        (this->*childFuncTable[7].opCo)();
+        break;
+    case 0xFF:
+        (this->*childFuncTable[8].opCo)();
+        break;
+    default:
+        switch ((loNibble & 0xF0) >> 4)
+        {
+        case 0xB:
+            (this->*childFuncTable[0].opCo)();
+            break;
+        case 0xC:
+            (this->*childFuncTable[1].opCo)();
+            break;
+        default:
+            opFunc unknown = { "Unknown Opcode", &Chip8::XXXX };
+            (this->*unknown.opCo)();
+            break;
+        }
+        break;
+    }
 }
 
 //Clears the display buffer.
@@ -484,7 +494,7 @@ void Chip8::ADXB()
 //Uses the loNibble to determine which 8XXX opcode to run
 void Chip8::eightOp()
 {
-    offset = getOffset();//possibly move to inside parent opcodes that call a child opcode
+    int offset = static_cast<int>(getOffset());//possibly move to inside parent opcodes that call a child opcode
 
     switch (loNibble & 0x0F)
     {
@@ -664,7 +674,7 @@ void Chip8::DRWXY()
 //Exnn: Determines what 'Exnn' opcode to branch to based on nn.
 void Chip8::hexEOp()
 {
-    offset = getOffset();//possibly move to inside parent opcodes that call a child opcode
+    int offset = static_cast<int>(getOffset());//possibly move to inside parent opcodes that call a child opcode
 
     if (loNibble == 0x9E)
         (this->*childFuncTable[0 + offset].opCo)();
@@ -693,7 +703,7 @@ void Chip8::SKNPX()
 //Uses the entire loNibble to determine what FXXX opcode function to run. 
 void Chip8::fOp()
 {
-    offset = getOffset();//possibly move to inside parent opcodes that call a child opcode
+    int offset = static_cast<int>(getOffset());//possibly move to inside parent opcodes that call a child opcode
 
     switch (loNibble)
     {    
@@ -723,6 +733,15 @@ void Chip8::fOp()
         break;
     case 0x65:
         (this->*childFuncTable[8 + offset].opCo)();
+        break;
+    case 0x30:
+        (this->*childFuncTable[9 + offset].opCo)();
+        break;
+    case 0x75:
+        (this->*childFuncTable[10 + offset].opCo)();
+        break;
+    case 0x85:
+        (this->*childFuncTable[11 + offset].opCo)();
         break;
     default:
         opFunc unknown = { "Unknown Opcode", &Chip8::XXXX };
@@ -848,9 +867,9 @@ void Chip8::SCDN()
 
     for (int x = 0; x < range.x; x++)
     {
-        auto x_gfxOffset = gfx.data() + (range.y * x);              //Sets x_gfxOffset to the address the first [x] element. 
-        memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.y - 4);  //This copies the first 28 elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
-        memset(x_gfxOffset, 0, 4);                                  //Clears now garbage at [x] + 4, setting values to 0. 
+        auto x_gfxOffset = gfx.data() + (range.y * x);                      //Sets x_gfxOffset to the address the first [x] element. 
+        memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.y - d_Scroll);   //This copies the first d_Scroll elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
+        memset(x_gfxOffset, 0, d_Scroll);                                   //Clears now garbage at [x] + d_Scroll, setting values to 0. 
     }
     pc += 2;
 }

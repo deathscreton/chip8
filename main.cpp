@@ -10,7 +10,6 @@
 #include "Init.hpp"
 #include "KeyHandler.hpp"
 
-
 void pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect) //Fills the SFML window buffer with the gfx buffer from the chip8 then draws it to the screen.
 {
     auto [x_range, y_range] = chip8.get_GfxRange();
