@@ -560,10 +560,10 @@ void Chip8::XORXY()
     pc += 2;
 }
 
-//8xy4: Adds VY to VX. VF is set to 1 when there's a carry and 0 when there isn't. Then stores the result in VX.
+//8xy4: Adds VX to VY. VF is set to 1 when there's a carry and 0 when there isn't. Then stores the result in VX.
 void Chip8::ADDXY()
 {
-    if ((V[(opcode & 0x0F00) >> 8]) + (V[(opcode & 0x00F0) >> 4]) >= 0xFF)
+    if ((V[(opcode & 0x0F00) >> 8]) + (V[(opcode & 0x00F0) >> 4]) > 0xFF)
         V[0xF] = 1;
     else
         V[0xF] = 0;
@@ -574,7 +574,7 @@ void Chip8::ADDXY()
 //8xy5: Compares VX to VY. If larger, set VF flag to 1, else set to 0, then subtract VY from VX, store the results in VX.
 void Chip8::SUBXY()
 {
-    if (V[(opcode & 0x0F00) >> 8] > V[(opcode & 0x00F0) >> 4])
+    if (V[(opcode & 0x0F00) >> 8] >= V[(opcode & 0x00F0) >> 4])
         V[0xF] = 1;
     else
         V[0xF] = 0;
@@ -593,7 +593,7 @@ void Chip8::SHRX()
 //8xy7: Compares VY to VX. If larger, set VF flag to 1, else set to 0, then subtract VX from VY, store the results in VX.
 void Chip8::SUBNXY()
 {
-    if (V[(opcode & 0x00F0) >> 4] > V[(opcode & 0x0F00) >> 8])
+    if (V[(opcode & 0x00F0) >> 4] >= V[(opcode & 0x0F00) >> 8])
         V[0xF] = 1;
     else
         V[0xF] = 0;
