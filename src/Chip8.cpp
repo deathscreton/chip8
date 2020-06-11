@@ -74,6 +74,8 @@ Chip8::Chip8()
         {"LDBX", &a::LDBX},     {"LDIX", &a::LDIX},     {"LDXI", &a::LDXI},             /////
     };
 
+    
+
     //std::cout << "Constructor initializing..." << std::endl;
 
     Chip8::LOW(); //set resolution to lowres.
@@ -837,12 +839,20 @@ void Chip8::SCUN()
 //00CN: Scroll display N lines down.
 void Chip8::SCDN()
 {
-    int unsigned d_Scroll = opcode & 0x000F;
+    /*
+        Funnily enough, SCDN with a 2D array is possible to do the same way SCR is able to be done with a 1D array. 
+        This is because we treat the [x] element like a column, instead of an index, which is the opposite of how the
+        SCR function works, because of the way I accessed the memory (and the way the buffer was setup).
+    */
+    int unsigned d_Scroll = opcode & 0x000F; //How many lines need to be scrolled. 
 
-    for (int loop = 0; loop < d_Scroll; loop++)
+    for (int x = 0; x < range.x; x++)
     {
-
+        auto x_gfxOffset = gfx.data() + (range.y * x);              //Sets x_gfxOffset to the address the first [x] element. 
+        memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.y - 4);  //This copies the first 28 elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
+        memset(x_gfxOffset, 0, 4);                                  //Clears now garbage at [x] + 4, setting values to 0. 
     }
+    pc += 2;
 }
 
 //00FB: Scroll display 4 pixels to the right.
@@ -856,18 +866,18 @@ void Chip8::SCR()
         its own, ie. the y elements are fragmented.. The quickest fix I know of is to just swap the x and y coordinates in the 2D gfx array. 
         This would require me rewriting multiple functions, and I was just lazy. So I'll chalk this up to a learning experience. 
         When folks say 2D arrays are syntax poison, this is what they mean. This, with a 1D array, or the x/y coordinates swapped, could be done
-        in two to three lines of code without the need for a temp array, or multiple for loops. 
+        in two to three lines of code without the need for a temp array, or multiple for loops, similarly to the way SCDN was done. 
     */
 
-    std::array<char, 128> temparr = { 0 }; //temporary array to hold a single contiguous line of [y] elements. 
+    std::array<char, 128> temparr = { 0 };                                  //temporary array to hold a single contiguous line of [y] elements. 
 
-    for (int y = 0; y < range.y; y++) //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
+    for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {   
-        auto yline = gfx.data() + y; //sets the address for the specific [y] element we need. 
+        auto yline = gfx.data() + y;                                        //sets the address for the specific [y] element we need. we also need a pointer so we can act on the data.
 
         for (int xcolumn = 0; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
         {   
-            auto y_gfxOffset = yline + (range.y * xcolumn);                 //sets the address of the current [x] and [y] element in memory based on above loops. 
+            auto y_gfxOffset = yline + (range.y * xcolumn);                 //sets the address of the current [x] and [y] element in memory based on above loops. again, another pointer so we can work on the data.
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
         for (int xcolumn = 4; xcolumn < range.x - 4; xcolumn++)
@@ -887,11 +897,11 @@ void Chip8::SCR()
 //00FC: Scroll display 4 pixels to the left. 
 void Chip8::SCL()
 {
-    std::array<char, 128> temparr = { 0 }; //temporary array to hold a single contiguous line of [y] elements. 
+    std::array<char, 128> temparr = { 0 };                                  //temporary array to hold a single contiguous line of [y] elements. 
 
-    for (int y = 0; y < range.y; y++) //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
+    for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
-        auto yline = gfx.data() + y; //sets the address for the specific [y] element we need. 
+        auto yline = gfx.data() + y;                                        //sets the address for the specific [y] element we need. 
 
         for (int xcolumn = 4; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
         {
@@ -933,7 +943,7 @@ void Chip8::HIGH()
 //FX30: Set I to the address of the SCHIP-8 16x10 font sprite representing the value in VX. 
 void Chip8::LDISC()
 {
-    I = (V[(opcode & 0x0F00) >> 8] * 0xA) + FONT_OFFSET; //Each character is ten bytes wide; multiply the result by ten so the memory for the font isn't overwritten
+    I = (V[(opcode & 0x0F00) >> 8] * 0xA) + FONT_OFFSET;                    //Each character is ten bytes wide; multiply the result by ten so the memory for the font isn't overwritten
     pc += 2;
 }
 
@@ -944,7 +954,7 @@ void Chip8::LDRVX()
     {
         RPL_FLAGS[mempos] = V[mempos];
     }
-    //I += ((opcode & 0x0F00) >> 8) + 1; //This is an old portion of this instruction from SCHIP 1.0 that was removed in 1.1. It's not needed in normal cases. 
+    //I += ((opcode & 0x0F00) >> 8) + 1;                                    //This is an old portion of this instruction from SCHIP 1.0 that was removed in 1.1. It's not needed in normal cases. 
     pc += 2;
 }
 
@@ -955,6 +965,6 @@ void Chip8::LDVXR()
     {
         V[mempos] = RPL_FLAGS[mempos];
     }
-    //I += ((opcode & 0x0F00) >> 8) + 1; //This is an old portion of this instruction from SCHIP 1.0 that was removed in 1.1. It's not needed in normal cases. 
+    //I += ((opcode & 0x0F00) >> 8) + 1;                                    //This is an old portion of this instruction from SCHIP 1.0 that was removed in 1.1. It's not needed in normal cases. 
     pc += 2;
 }
