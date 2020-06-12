@@ -142,7 +142,7 @@ private:
 
     std::string romName;                            //String variable that carries the current ROM in memory.
 
-    struct gfx_range { int x = 0; int y = 0; }range;     //Stores maximum element amount for x and y value in the gfx buffer. Can have values of 128x64 (highres) or 64x32(lowres).    
+    struct gfx_range { int x = 0; int y = 0; }range;//Stores maximum element amount for x and y value in the gfx buffer. Can have values of 128x64 (highres) or 64x32(lowres).    
 
     int unsigned const FONT_OFFSET = 80;            //Offset for SCHIP8 Fontset.
 

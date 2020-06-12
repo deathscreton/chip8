@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
         {
             if (!beepBuffer.loadFromFile("beep.wav"))
             {
-                std::cerr << "Error loading sound file. Please check that the file name is beep.wav and is located next to the executable. Continuing execution..." << std::endl;
+                std::cerr << "Error loading sound file. Please check that the file name is beep.wav and is located next to the executable. Continuing execution... \n";
             }
             else
             {
@@ -115,14 +115,14 @@ int main(int argc, char* argv[])
         }
         else
         {
-            std::cerr << "Error: Something failed with loading the ROM. Check provided errors and try again." << std::endl;
+            std::cerr << "Error: Something failed with loading the ROM. Check provided errors and try again. \n";
             std::cin.get();
             return 1;
         }
     }
     else
     {
-        std::cerr << "Something failed with setting opening program parameters.";
+        std::cerr << "Something failed with setting opening program parameters. \n";
         return 1;
     }
     return 0;

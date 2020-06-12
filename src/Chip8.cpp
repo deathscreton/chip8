@@ -76,7 +76,7 @@ Chip8::Chip8()
         {"LDISC", &a::LDISC},   {"LDRVX", &a::LDRVX},   {"LDVXR", &a::LDVXR}
     };
 
-    //std::cout << "Constructor initializing..." << std::endl;
+    //std::cout << "Constructor initializing... \n";
 
     Chip8::LOW(); //set resolution to lowres.
 
@@ -118,7 +118,7 @@ Chip8::Chip8()
     superFlag = false;
 
 #ifdef _DEBUG
-    std::cout << "gfx buffer is " << sizeof(gfx) << " bytes big." << std::endl;
+    std::cout << "gfx buffer is " << sizeof(gfx) << " bytes big. \n";
 #endif //!_DEBUG
 }
 
@@ -255,6 +255,26 @@ bool Chip8::isValidOp(const char &nibble)
     return (0x00 <= nibble && nibble <= 0xF);
 }
 
+//Method responsible for setting chip8 opening variables from argc and argv. 
+bool Chip8::setOpenParams(const int argc, const char* rom)
+{
+    //Check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
+    if (argc < 2)
+    {
+        std::cout << "Enter the absolute ROM file path(extension included): \n";
+        std::getline(std::cin, romName);
+        return true;
+    }
+    else if (argc == 2)
+    {
+        romName = rom;
+        return true;
+    }
+
+    std::cerr << "Something went terribly wrong when collecting rom name. \n";
+    return false;
+}
+
 //Function responsible for loading program into memory.
 bool Chip8::loadROM()
 {
@@ -262,7 +282,7 @@ bool Chip8::loadROM()
     std::ifstream romfile(romName.data(), std::ios::binary);
     if (!romfile)
     {
-        std::cerr << "Error opening " << romName << ". Please check the name of your file and try again." << std::endl;
+        std::cerr << "Error opening " << romName << ". Please check the name of your file and try again. (You didn't include quotes, did you?) \n";
         return false;
     }
 
@@ -270,13 +290,13 @@ bool Chip8::loadROM()
     romfile.seekg(0L, std::ios::end);
     const int unsigned fsize = romfile.tellg();
     romfile.seekg(0L, std::ios::beg);
-    std::cout << romName << " is " << fsize << " bytes." << std::endl;
+    std::cout << romName << " is " << fsize << " bytes. \n";
 
     //create buffer using rom size
     std::vector<char> romBuffer(fsize);
     if (romBuffer.empty())
     {
-        std::cerr << "Error creating memory buffer." << std::endl;
+        std::cerr << "Error creating memory buffer. \n";
         return false;
     }
 
@@ -285,7 +305,7 @@ bool Chip8::loadROM()
     romfile.close();
     if (romBuffer.size() != fsize)
     {
-        std::cerr << "Error writing file to buffer." << std::endl;
+        std::cerr << "Error writing file to buffer. \n";
         return false;
     }
 
@@ -299,11 +319,12 @@ bool Chip8::loadROM()
     }
     else
     {
-        std::cerr << "ERROR: ROM file size is too large for memory!" << std::endl;
+        std::cerr << "ERROR: ROM file size is too large for memory! \n";
         return false;
     }
     return true;
 }
+
 
 //Supplies an offset for child opcodes that are derived from a parent opcode like 8XXX. This offset is used to determine which opcode function is ran from within vector childFuncTable. 
 enum class Chip8::childFuncOffset Chip8::getOffset()
@@ -323,25 +344,6 @@ enum class Chip8::childFuncOffset Chip8::getOffset()
         return Chip8::childFuncOffset::noOffset;
         break;
     }
-}
-
-bool Chip8::setOpenParams(const int argc, const char* rom)
-{
-    //Check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
-    if (argc < 2)
-    {
-        std::cout << "Enter the absolute ROM file path(extension included): \n";
-        getline(std::cin, romName);
-        return true;
-    }
-    else if (argc == 2)
-    {
-        romName = rom;
-        return true;
-    }
-
-    std::cerr << "Something went terribly wrong when collecting rom name." << std::endl;
-    return false;
 }
 
 #ifdef _DEBUG
@@ -842,7 +844,7 @@ void Chip8::LDXI()
 //Catch all for unknown opcodes.
 void Chip8::XXXX()
 {
-    std::cout << "Unknown Opcode: " << std::hex << opcode << std::endl;
+    std::cout << "Unknown Opcode: " << std::hex << opcode << "\n";
 }
 
 ////////////
@@ -867,7 +869,7 @@ void Chip8::SCDN()
 
     for (int x = 0; x < range.x; x++)
     {
-        auto x_gfxOffset = gfx.data() + (range.y * x);                      //Sets x_gfxOffset to the address the first [x] element. 
+        auto x_gfxOffset = &gfx[x][0];                    //Sets x_gfxOffset to the address the first [x] element. 
         memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.y - d_Scroll);   //This copies the first d_Scroll elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
         memset(x_gfxOffset, 0, d_Scroll);                                   //Clears now garbage at [x] + d_Scroll, setting values to 0. 
     }
@@ -891,22 +893,20 @@ void Chip8::SCR()
     std::array<char, 128> temparr = { 0 };                                  //temporary array to hold a single contiguous line of [y] elements. 
 
     for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
-    {   
-        auto yline = gfx.data() + y;                                        //sets the address for the specific [y] element we need. we also need a pointer so we can act on the data.
-
+    {
         for (int xcolumn = 0; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
         {   
-            auto y_gfxOffset = yline + (range.y * xcolumn);                 //sets the address of the current [x] and [y] element in memory based on above loops. again, another pointer so we can work on the data.
+            auto y_gfxOffset = &gfx[xcolumn][y];            //sets the address of the current [x] and [y] element in memory based on above loops. again, another pointer so we can work on the data.
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
         for (int xcolumn = 4; xcolumn < range.x - 4; xcolumn++)
         {
-            auto y_gfxOffset = yline + (range.y * xcolumn);
+            auto y_gfxOffset = &gfx[xcolumn][y];
             memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
         }
         for (int xcolumn = 0; xcolumn < 4; xcolumn++)
         {
-            auto y_gfxOffset = yline + (range.y * xcolumn);
+            auto y_gfxOffset = &gfx[xcolumn][y];
             memset(y_gfxOffset, 0, 1);
         }
     }
@@ -920,16 +920,14 @@ void Chip8::SCL()
 
     for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
-        auto yline = gfx.data() + y;                                        //sets the address for the specific [y] element we need. 
-
         for (int xcolumn = 4; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
         {
-            auto y_gfxOffset = yline + (range.y * xcolumn);                 //sets the address of the current [x] and [y] element in memory based on above loops. 
+            auto y_gfxOffset = &gfx[xcolumn][y];                //sets the address of the current [x] and [y] element in memory based on above loops. 
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
         for (int xcolumn = 0; xcolumn < range.x; xcolumn++)
         {
-            auto y_gfxOffset = yline + (range.y * xcolumn);
+            auto y_gfxOffset = &gfx[xcolumn][y];
             memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
         }
     }
