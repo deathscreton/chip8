@@ -1,6 +1,6 @@
 #include "Chip8.hpp"
 
-char unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five bytes.
+char const unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five bytes.
 {
     0xF0, 0x90, 0x90, 0x90, 0xF0,   // 0
     0x20, 0x60, 0x20, 0x20, 0x70,   // 1
@@ -20,24 +20,24 @@ char unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five 
     0xF0, 0x80, 0xF0, 0x80, 0x80    // F
 };
 
-short int unsigned fontset10[80] =            //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. 
+char const unsigned fontset10[160] =            //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. 
 {
-    0xC67C, 0xDECE, 0xF6D6, 0xC6E6, 0x007C, // 0
-    0x3010, 0x30F0, 0x3030, 0x3030, 0x00FC, // 1
-    0xCC78, 0x0CCC, 0x3018, 0xCC60, 0x00FC, // 2
-    0xCC78, 0x0C0C, 0x0C38, 0xCC0C, 0x0078, // 3
-    0x1C0C, 0x6C3C, 0xFECC, 0x0C0C, 0x001E, // 4
-    0xC0FC, 0xC0C0, 0x0CF8, 0xCC0C, 0x0078, // 5
-    0x6038, 0xC0C0, 0xCCF8, 0xCCCC, 0x0078, // 6
-    0xC6FE, 0x06C6, 0x180C, 0x3030, 0x0030, // 7
-    0xCC78, 0xECCC, 0xDC78, 0xCCCC, 0x0078, // 8
-    0xC67C, 0xC6C6, 0x0C7E, 0x3018, 0x0070, // 9
-    0x7830, 0xCCCC, 0xFCCC, 0xCCCC, 0x00CC, // A
-    0x66FC, 0x6666, 0x667C, 0x6666, 0x00FC, // B
-    0x663C, 0xC0C6, 0xC0C0, 0x66C6, 0x003C, // C
-    0x6CF8, 0x6666, 0x6666, 0x6C66, 0x00F8, // D
-    0x62FE, 0x6460, 0x647C, 0x6260, 0x00FE, // E
-    0x66FE, 0x6462, 0x647C, 0x6060, 0x00F0  // F
+    0xF0, 0xF0, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0xF0, 0xF0, // 0
+    0x20, 0x20, 0x60, 0x60, 0x20, 0x20, 0x20, 0x20, 0x70, 0x70, // 1
+    0xF0, 0xF0, 0x10, 0x10, 0xF0, 0xF0, 0x80, 0x80, 0xF0, 0xF0, // 2
+    0xF0, 0xF0, 0x10, 0x10, 0xF0, 0xF0, 0x10, 0x10, 0xF0, 0xF0, // 3
+    0x90, 0x90, 0x90, 0x90, 0xF0, 0xF0, 0x10, 0x10, 0x10, 0x10, // 4
+    0xF0, 0xF0, 0x80, 0x80, 0xF0, 0xF0, 0x10, 0x10, 0xF0, 0xF0, // 5
+    0xF0, 0xF0, 0x80, 0x80, 0xF0, 0xF0, 0x90, 0x90, 0xF0, 0xF0, // 6
+    0xF0, 0xF0, 0x10, 0x10, 0x20, 0x20, 0x40, 0x40, 0x40, 0x40, // 7
+    0xF0, 0xF0, 0x90, 0x90, 0xF0, 0xF0, 0x90, 0x90, 0xF0, 0xF0, // 8
+    0xF0, 0xF0, 0x90, 0x90, 0xF0, 0xF0, 0x10, 0x10, 0xF0, 0xF0, // 9
+    0xF0, 0xF0, 0x90, 0x90, 0xF0, 0xF0, 0x90, 0x90, 0x90, 0x90, // A
+    0xE0, 0xE0, 0x90, 0x90, 0xE0, 0xE0, 0x90, 0x90, 0xE0, 0xE0, // B
+    0xF0, 0xF0, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0, 0xF0, // C
+    0xE0, 0xE0, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0xE0, 0xE0, // D
+    0xF0, 0xF0, 0x80, 0x80, 0xF0, 0xF0, 0x80, 0x80, 0xF0, 0xF0, // E
+    0xF0, 0xF0, 0x80, 0x80, 0xF0, 0xF0, 0x80, 0x80, 0x80, 0x80  // F
 };
 
 Chip8::Chip8()
@@ -661,11 +661,11 @@ void Chip8::DRWXY()
         {
             if ((pixel & (0x80 >> xline)) != 0)//scans the bits one at a time. if the current bit is 1, then it needs to be checked for collision. shifts bits to the right based on loop iteration.
             {
-               if (gfx[x + xline][y + yline] == 1)//checks if the bit on the screen is set. if it is, set VF to 1. used for collision.
+               if (gfx[(x + xline) % range.x][(y + yline) % range.y] == 1)//checks if the bit on the screen is set. if it is, set VF to 1. used for collision. % used to make sure selection is inbounds.
                {
                   V[0xF] = 1;//set flag register to one for collision
                }
-               gfx[x + xline][y + yline] ^= 1;
+               gfx[(x + xline) % range.x][(y + yline) % range.y] ^= 1;
             }
         }
     }
@@ -870,9 +870,10 @@ void Chip8::SCDN()
     for (int x = 0; x < range.x; x++)
     {
         auto x_gfxOffset = &gfx[x][0];                    //Sets x_gfxOffset to the address the first [x] element. 
-        memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.y - d_Scroll);   //This copies the first d_Scroll elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
+        memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.x - d_Scroll);   //This copies the first d_Scroll elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
         memset(x_gfxOffset, 0, d_Scroll);                                   //Clears now garbage at [x] + d_Scroll, setting values to 0. 
     }
+    drawFlag = true;
     pc += 2;
 }
 
@@ -894,35 +895,36 @@ void Chip8::SCR()
 
     for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
-        for (int xcolumn = 0; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
+        for (int xcolumn = 0; xcolumn < range.x /*- 4*/; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
         {   
-            auto y_gfxOffset = &gfx[xcolumn][y];            //sets the address of the current [x] and [y] element in memory based on above loops. again, another pointer so we can work on the data.
+            auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];                            //sets the address of the current [x] and [y] element in memory based on above loops. again, another pointer so we can work on the data.
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
-        for (int xcolumn = 4; xcolumn < range.x - 4; xcolumn++)
+        for (int xcolumn = 0; xcolumn < range.x/*- 4*/; xcolumn++)
         {
-            auto y_gfxOffset = &gfx[xcolumn][y];
+            auto y_gfxOffset = &gfx[(xcolumn + 4) % range.x][y % range.y];
             memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
         }
-        for (int xcolumn = 0; xcolumn < 4; xcolumn++)
+        /*for (int xcolumn = 0; xcolumn < 4; xcolumn++)
         {
-            auto y_gfxOffset = &gfx[xcolumn][y];
+            auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];
             memset(y_gfxOffset, 0, 1);
-        }
+        }*/
     }
+    drawFlag = true;
     pc += 2;
 }
 
 //00FC: Scroll display 4 pixels to the left. 
 void Chip8::SCL()
 {
-    std::array<char, 128> temparr = { 0 };                                  //temporary array to hold a single contiguous line of [y] elements. 
+    /*std::array<char, 128> temparr = { 0 };                                  //temporary array to hold a single contiguous line of [y] elements. 
 
     for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
-        for (int xcolumn = 4; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
+        for (int xcolumn = 0; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
         {
-            auto y_gfxOffset = &gfx[xcolumn][y];                //sets the address of the current [x] and [y] element in memory based on above loops. 
+            auto y_gfxOffset = &gfx[xcolumn + 4][y];                            //sets the address of the current [x] and [y] element in memory based on above loops. 
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
         for (int xcolumn = 0; xcolumn < range.x; xcolumn++)
@@ -930,7 +932,23 @@ void Chip8::SCL()
             auto y_gfxOffset = &gfx[xcolumn][y];
             memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
         }
+    }*/
+
+    for (int j = 0; j < 64; j++) 
+    {
+        for (int i = 123; i >= 0; i--) 
+        {
+            gfx[i][j] = gfx[i + 4][j];
+        }
     }
+    for (int i = 124; i < 128; i++) 
+    {
+        for (int j = 0; j < 64; j++) 
+        {
+            gfx[i][j] = 0;
+        }
+    }
+    drawFlag = true;
     pc += 2;
 }
 
