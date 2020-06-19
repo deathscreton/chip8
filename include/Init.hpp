@@ -15,6 +15,7 @@ extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
 
 namespace
 {
+    bool isPaused = false;          //quick flag to pause emulation when running. This will eventually be turned into a full fledge debugger.
     float SCALE_FACTOR = 12.5f; //ratio between resolutions 64x32 and 800x600. Changes to 6.25 if SuperFlag is set.
 }
 

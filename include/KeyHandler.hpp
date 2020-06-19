@@ -81,6 +81,9 @@ void keyStatePressed(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer
         chip8.hardReset();
         chip8.loadROM();
         break;
+    case sf::Keyboard::Space: //Pauses emulation if isPaused = false. Otherwise, unpauses emulation.
+        isPaused == true ? isPaused = false : isPaused = true;
+        break;
     case sf::Keyboard::Num1:
         chip8.key[0x1] = 1;
         break;

@@ -48,8 +48,7 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
                 break;
             }
         }
-
-        chip8.emulateCycle();
+        if (!isPaused) chip8.emulateCycle();
 
         if (chip8.quitFlag) mainWindow.close();
 
@@ -61,8 +60,6 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
         {
             SCALE_FACTOR = 12.5;
         }
-
-
         if (chip8.drawFlag)
         {
             mainWindow.clear(sf::Color::Black);
@@ -77,7 +74,6 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
 
             chip8.drawFlag = false;
         }
-
         if (chip8.playSound)
         {
             beepSound.play();
