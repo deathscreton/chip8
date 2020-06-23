@@ -48,13 +48,13 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
                 break;
             }
         }
-        if (!isPaused) chip8.emulateCycle();
+        if (!chip8.isPaused) chip8.emulateCycle();
 
         if (chip8.quitFlag) mainWindow.close();
 
         if (chip8.superFlag)
         {
-            SCALE_FACTOR = 6.25;
+            SCALE_FACTOR = 10;
         }
         else
         {
@@ -67,7 +67,7 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
             pushBuffer(chip8, mainWindow, chip8SpriteRect);
             
             #ifdef _DEBUG
-            chip8.debugRender();
+            //chip8.debugRender();
             #endif // _DEBUG
 
             mainWindow.display();
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
     sf::Event event; //Creates event object to contain event types necessary for interactivity.
     sf::SoundBuffer beepBuffer; //Creates sound buffer to hold beep.wav file.
     sf::Sound beepSound; //Creates sound object to control buffer playback.
-    sf::RenderWindow mainWindow(sf::VideoMode(800, 600), "Chip 8 Emulator"); //Create and declare Window object for rendering.
+    sf::RenderWindow mainWindow(sf::VideoMode(1280, 720), "Chip 8 Emulator"); //Create and declare Window object for rendering.
     sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR)); //Create RectangleShape object with a size of 12.5f, which is also the scale factor.
 
     //OBJECT INITIALIZATION END//

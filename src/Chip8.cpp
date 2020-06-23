@@ -22,6 +22,16 @@ char const unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is
 
 char const unsigned fontset10[160] =            //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. 
 {
+        /*0x3C, 0x7E, 0xE7, 0xC3, 0xC3, 0xC3, 0xC3, 0xE7, 0x7E, 0x3C,
+        0x18, 0x38, 0x58, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x3C,
+        0x3E, 0x7F, 0xC3, 0x06, 0x0C, 0x18, 0x30, 0x60, 0xFF, 0xFF,
+        0x3C, 0x7E, 0xC3, 0x03, 0x0E, 0x0E, 0x03, 0xC3, 0x7E, 0x3C,
+        0x06, 0x0E, 0x1E, 0x36, 0x66, 0xC6, 0xFF, 0xFF, 0x06, 0x06,
+        0xFF, 0xFF, 0xC0, 0xC0, 0xFC, 0xFE, 0x03, 0xC3, 0x7E, 0x3C,
+        0x3E, 0x7C, 0xC0, 0xC0, 0xFC, 0xFE, 0xC3, 0xC3, 0x7E, 0x3C,
+        0xFF, 0xFF, 0x03, 0x06, 0x0C, 0x18, 0x30, 0x60, 0x60, 0x60,
+        0x3C, 0x7E, 0xC3, 0xC3, 0x7E, 0x7E, 0xC3, 0xC3, 0x7E, 0x3C,
+        0x3C, 0x7E, 0xC3, 0xC3, 0x7F, 0x3F, 0x03, 0x03, 0x3E, 0x7C*/
     0xF0, 0xF0, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0xF0, 0xF0, // 0
     0x20, 0x20, 0x60, 0x60, 0x20, 0x20, 0x20, 0x20, 0x70, 0x70, // 1
     0xF0, 0xF0, 0x10, 0x10, 0xF0, 0xF0, 0x80, 0x80, 0xF0, 0xF0, // 2
@@ -88,8 +98,8 @@ Chip8::Chip8()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < range.x; x++)
-        for (int y = 0; y < range.y; y++)
+    for (int x = 0; x < 128; x++)
+        for (int y = 0; y < 64; y++)
             gfx[x][y] = 0;
 
     //nulls memory for initialization
@@ -101,8 +111,8 @@ Chip8::Chip8()
         memory[x] = fontset[x];
 
     //fill memory with schip8 fontset
-    for (int x = 0; x < 80; x++)
-        memory[x + FONT_OFFSET] = fontset10[x];
+    for (int x = 0; x < 160; x++)
+        memory[x + 80] = fontset10[x];
 
     //nulls the stack
     for (int x = 0; x < 16; x++)
@@ -112,10 +122,15 @@ Chip8::Chip8()
     for (int x = 0; x < 16; x++)
         V[x] = 0;
 
+    //clears all user HP flags
+    for (int x = 0; x < 7; x++)
+        RPL_FLAGS[x] = 0;
+
     playSound = false;
     drawFlag = true;
     quitFlag = false;
     superFlag = false;
+    isPaused = false;
 
 #ifdef _DEBUG
     std::cout << "gfx buffer is " << sizeof(gfx) << " bytes big. \n";
@@ -139,8 +154,8 @@ void Chip8::softReset()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < range.x; x++)
-        for (int y = 0; y < range.y; y++)
+    for (int x = 0; x < 128; x++)
+        for (int y = 0; y < 64; y++)
             gfx[x][y] = 0;
 
     //nulls the stack
@@ -155,7 +170,15 @@ void Chip8::softReset()
     for (int x = 0; x < 16; x++)
         key[x] = 0;
 
+    //clears all user HP flags
+    for (int x = 0; x < 7; x++)
+        RPL_FLAGS[x] = 0;
+
+    playSound = false;
     drawFlag = true;
+    quitFlag = false;
+    superFlag = false;
+    isPaused = false;
 
 #ifdef _DEBUG
     std::cout << "Current ROM loaded:" << romName;
@@ -175,8 +198,8 @@ void Chip8::hardReset()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < range.x; x++)
-        for (int y = 0; y < range.y; y++)
+    for (int x = 0; x < 128; x++)
+        for (int y = 0; y < 64; y++)
             gfx[x][y] = 0;
 
     //nulls memory for initialization
@@ -186,6 +209,10 @@ void Chip8::hardReset()
     //fill memory with fontset
     for (int x = 0; x < 80; x++)
         memory[x] = fontset[x];
+
+    //fill memory with schip8 fontset
+    for (int x = 0; x < 160; x++)
+        memory[x + 80] = fontset10[x];
 
     //nulls the stack
     for (int x = 0; x < 16; x++)
@@ -199,8 +226,15 @@ void Chip8::hardReset()
     for (int x = 0; x < 16; x++)
         key[x] = 0;
 
+    //clears all user HP flags
+    for (int x = 0; x < 7; x++)
+        RPL_FLAGS[x] = 0;
+
+    playSound = false;
     drawFlag = true;
+    quitFlag = false;
     superFlag = false;
+    isPaused = false;
 
     std::cout << "Enter the absolute ROM file path(extension included): \n";
     getline(std::cin, romName);
@@ -645,21 +679,37 @@ void Chip8::DRWXY()
 {
     short unsigned x = V[(opcode & 0x0F00) >> 8];
     short unsigned y = V[(opcode & 0x00F0) >> 4];
-    short unsigned height = opcode & 0x000F;//maximum row amount, aka, pixel height
-    short unsigned pixel;
+    short unsigned height = opcode & 0x000F;
     short unsigned bits = 8;
+    short unsigned mask = 0x80;
+
+    std::vector<short unsigned> pixel;
 
     V[0xF] = 0;//sets flag register to zero. necessary for correct collision detection.
     
-    if (height == 0 and superFlag) { height = 16; bits = 16; } //checks if schip8 draw function is necessary, otherwise, 
+    if (height == 0 and superFlag) //checks if schip8 draw function is necessary and sets required values and loads two byte sprites into memory. 
+    {   
+        height = 16; 
+        bits = 16; 
+        mask = 0x8000;
 
+        for (int index = 0; index < 32; index += 2)
+        {
+            pixel.push_back(memory[I + index] << 8 | memory[I + index + 1]); //twobyte sprite load is similar to opcode load.
+        }
+    }
+    else //otherwise, loads regular byte sprite into memory.
+    {
+        for(int index = 0; index < height; index++)
+        {
+            pixel.push_back(memory[I + index]);
+        }
+    }
     for (int yline = 0; yline < height; yline++)//loop for however many rows there are which is determined by 'height'
     {
-        pixel = memory[I + yline];//grab the byte from memory and store it in the variable 'pixel'. each bit in this byte is a set value for a pixel to be drawn.
-
         for (int xline = 0; xline < bits; xline++)//loop for all eight bits, sixteen if using schip8 draw function
         {
-            if ((pixel & (0x80 >> xline)) != 0)//scans the bits one at a time. if the current bit is 1, then it needs to be checked for collision. shifts bits to the right based on loop iteration.
+            if ((pixel[yline] & (mask >> xline)) != 0)//scans the bits one at a time. if the current bit is 1, then it needs to be checked for collision. shifts bits to the right based on loop iteration.
             {
                if (gfx[(x + xline) % range.x][(y + yline) % range.y] == 1)//checks if the bit on the screen is set. if it is, set VF to 1. used for collision. % used to make sure selection is inbounds.
                {
@@ -860,17 +910,12 @@ void Chip8::SCUN()
 //00CN: Scroll display N lines down.
 void Chip8::SCDN()
 {
-    /*
-        Funnily enough, SCDN with a 2D array is possible to do the same way SCR is able to be done with a 1D array. 
-        This is because we treat the [x] element like a column, instead of an index, which is the opposite of how the
-        SCR function works, because of the way I accessed the memory (and the way the buffer was setup).
-    */
-    int unsigned d_Scroll = opcode & 0x000F; //How many lines need to be scrolled. 
+    int unsigned d_Scroll = opcode & 0x000F;                                //How many lines need to be scrolled. 
 
     for (int x = 0; x < range.x; x++)
     {
-        auto x_gfxOffset = &gfx[x][0];                    //Sets x_gfxOffset to the address the first [x] element. 
-        memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.x - d_Scroll);   //This copies the first d_Scroll elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
+        auto x_gfxOffset = &gfx[x][0];                                      //Sets x_gfxOffset to the address the first [x] element. 
+        memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.y - d_Scroll);   //This copies the first d_Scroll elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
         memset(x_gfxOffset, 0, d_Scroll);                                   //Clears now garbage at [x] + d_Scroll, setting values to 0. 
     }
     drawFlag = true;
@@ -880,36 +925,25 @@ void Chip8::SCDN()
 //00FB: Scroll display 4 pixels to the right.
 void Chip8::SCR()
 {
-    /*  
-        The following code for SCR/L is terrible and should only be viewed as a logical example, and not a pratical one. I'll be changing this eventually, 
-        but I just wanted something that works and I believe this one does. The code is setup this way since I used a 2D std::array. 2D arrays 
-        store information in memory continguously, but does it in row order, ie. [row][column]. Row two follows row one, and row three follows row two. 
-        Because of this, you can't access bytes in y columns continguously, and must change the x element everytime you want to access a y element on
-        its own, ie. the y elements are fragmented.. The quickest fix I know of is to just swap the x and y coordinates in the 2D gfx array. 
-        This would require me rewriting multiple functions, and I was just lazy. So I'll chalk this up to a learning experience. 
-        When folks say 2D arrays are syntax poison, this is what they mean. This, with a 1D array, or the x/y coordinates swapped, could be done
-        in two to three lines of code without the need for a temp array, or multiple for loops, similarly to the way SCDN was done. 
-    */
-
-    std::array<char, 128> temparr = { 0 };                                  //temporary array to hold a single contiguous line of [y] elements. 
+    std::array<unsigned char, 128> temparr = { 0 };                         //temporary array to hold a single contiguous line of [y] elements. 
 
     for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
-        for (int xcolumn = 0; xcolumn < range.x /*- 4*/; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
+        for (int xcolumn = 0; xcolumn < range.x; xcolumn++)                 //changes row based on loop iteration. Effectively changes the [x] element.
         {   
-            auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];                            //sets the address of the current [x] and [y] element in memory based on above loops. again, another pointer so we can work on the data.
+            auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];        //sets the address of the current [x] and [y] element in memory based on above loops. again, another pointer so we can work on the data.
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
-        for (int xcolumn = 0; xcolumn < range.x/*- 4*/; xcolumn++)
+        for (int xcolumn = 0; xcolumn < range.x; xcolumn++)
         {
             auto y_gfxOffset = &gfx[(xcolumn + 4) % range.x][y % range.y];
             memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
         }
-        /*for (int xcolumn = 0; xcolumn < 4; xcolumn++)
+        for (int xcolumn = 0; xcolumn < 4; xcolumn++)
         {
             auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];
             memset(y_gfxOffset, 0, 1);
-        }*/
+        }
     }
     drawFlag = true;
     pc += 2;
@@ -918,34 +952,24 @@ void Chip8::SCR()
 //00FC: Scroll display 4 pixels to the left. 
 void Chip8::SCL()
 {
-    /*std::array<char, 128> temparr = { 0 };                                  //temporary array to hold a single contiguous line of [y] elements. 
+    std::array<unsigned char, 128> temparr = { 0 };                         //temporary array to hold a single contiguous line of [y] elements. 
 
     for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
-        for (int xcolumn = 0; xcolumn < range.x - 4; xcolumn++)             //changes row based on loop iteration. Effectively changes the [x] element.
+        for (unsigned int xcolumn = 0; xcolumn < range.x; xcolumn++)        //changes row based on loop iteration. Effectively changes the [x] element.
         {
-            auto y_gfxOffset = &gfx[xcolumn + 4][y];                            //sets the address of the current [x] and [y] element in memory based on above loops. 
+            auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];        //sets the address of the current [x] and [y] element in memory based on above loops. 
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
-        for (int xcolumn = 0; xcolumn < range.x; xcolumn++)
+        for (unsigned int xcolumn = 0; xcolumn < range.x; xcolumn++)
         {
-            auto y_gfxOffset = &gfx[xcolumn][y];
+            auto y_gfxOffset = &gfx[(xcolumn - 4) % range.x][y % range.y];
             memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
         }
-    }*/
-
-    for (int j = 0; j < 64; j++) 
-    {
-        for (int i = 123; i >= 0; i--) 
+        for (int xcolumn = 127; xcolumn >= 124; xcolumn--)
         {
-            gfx[i][j] = gfx[i + 4][j];
-        }
-    }
-    for (int i = 124; i < 128; i++) 
-    {
-        for (int j = 0; j < 64; j++) 
-        {
-            gfx[i][j] = 0;
+            auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];
+            memset(y_gfxOffset, 0, 1);
         }
     }
     drawFlag = true;

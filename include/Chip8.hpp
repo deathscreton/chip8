@@ -49,7 +49,8 @@ public:
     bool drawFlag;                                              //Determines if something was written to the display buffer and needs to be pushed.
     bool playSound;                                             //Determines if the beep sound is ready to play. 
     bool quitFlag;                                              //Determines if the program/interpreter requested the application to quit. Currently closes application, but may change it to reset instead.
-    bool superFlag;                                             //Determines if the system should use highres (true) or lowres (false). 
+    bool superFlag;                                             //Determines if the system should use highres (true) or lowres (false).
+    bool isPaused;                                              //quick flag to pause emulation when running. This will eventually be turned into a full fledge debugger.
 
     std::array<std::array<char, 64>, 128> gfx = { 0,0 };        //Screen buffer. Uses extended buffer range for both CHIP8 and SCHIP roms. Using std container for array to make use of container members. 
     char unsigned key[16]{ 0 };                                 //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
@@ -142,7 +143,7 @@ private:
 
     std::string romName;                            //String variable that carries the current ROM in memory.
 
-    struct gfx_range { int x = 64; int y = 32; }range;//Stores maximum element amount for x and y value in the gfx buffer. Can have values of 128x64 (highres) or 64x32(lowres).    
+    struct gfx_range { unsigned int x = 64; unsigned int y = 32; }range;//Stores maximum element amount for x and y value in the gfx buffer. Can have values of 128x64 (highres) or 64x32(lowres).    
 
     int unsigned const FONT_OFFSET = 80;            //Offset for SCHIP8 Fontset.
 
