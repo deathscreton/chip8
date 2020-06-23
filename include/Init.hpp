@@ -12,10 +12,15 @@ extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
 //
 
 //MAIN VARIABLE// These variables are intended to be used in main only, and thus are wrapped in an anonymous namespace to avoid global scope.
+//these are temporary and will be going away in the code refactor. 
 
 namespace
 {
-    float SCALE_FACTOR = 12.5f; //ratio between resolutions 64x32 and 800x600. Changes to 6.25 if SuperFlag is set.
+    int x_res = 1280;
+    int y_res = 720;
+
+    float x_scale;
+    float y_scale;
 }
 
 //MAIN VARIABLE END//

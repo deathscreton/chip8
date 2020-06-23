@@ -13,12 +13,16 @@
 void pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect) //Fills the SFML window buffer with the gfx buffer from the chip8 then draws it to the screen.
 {
     auto [x_range, y_range] = chip8.get_GfxRange();
-
-    for (int y = 0; y < y_range; ++y)
+    
+    x_scale = x_res / x_range;
+    y_scale = y_res / y_range;
+    
+    for (unsigned int y = 0; y < y_range; ++y)
     {
-        for (int x = 0; x < x_range; ++x)
+        for (unsigned int x = 0; x < x_range; ++x)
         {
-            if (chip8.gfx[x][y] == 1) chip8SpriteRect.setPosition(x * SCALE_FACTOR, y * SCALE_FACTOR); //Multiply the position value by the scale factor so nothing overlaps
+            //this if statement is not properly containing the float for the quotient of y_res / y_range. This needs to be debugged. 
+            if (chip8.gfx[x][y] == 1) chip8SpriteRect.setPosition(x * x_scale, y * 11.25f ); //Multiply the position value by the scale factor so nothing overlaps and the array scales.
             
             mainWindow.draw(chip8SpriteRect);
         }
@@ -49,17 +53,6 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
             }
         }
         if (!chip8.isPaused) chip8.emulateCycle();
-
-        if (chip8.quitFlag) mainWindow.close();
-
-        if (chip8.superFlag)
-        {
-            SCALE_FACTOR = 10;
-        }
-        else
-        {
-            SCALE_FACTOR = 12.5;
-        }
         if (chip8.drawFlag)
         {
             mainWindow.clear(sf::Color::Black);
@@ -90,8 +83,8 @@ int main(int argc, char* argv[])
     sf::Event event; //Creates event object to contain event types necessary for interactivity.
     sf::SoundBuffer beepBuffer; //Creates sound buffer to hold beep.wav file.
     sf::Sound beepSound; //Creates sound object to control buffer playback.
-    sf::RenderWindow mainWindow(sf::VideoMode(1280, 720), "Chip 8 Emulator"); //Create and declare Window object for rendering.
-    sf::RectangleShape chip8SpriteRect(sf::Vector2f(SCALE_FACTOR, SCALE_FACTOR)); //Create RectangleShape object with a size of 12.5f, which is also the scale factor.
+    sf::RenderWindow mainWindow(sf::VideoMode(x_res, y_res), "Chip 8 Emulator"); //Create and declare Window object for rendering.
+    sf::RectangleShape chip8SpriteRect(sf::Vector2f(10, 11.25)); //Create RectangleShape object with a size of scale factor.
 
     //OBJECT INITIALIZATION END//
 

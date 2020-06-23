@@ -386,9 +386,9 @@ void Chip8::debugRender()
 {
     auto [x_range, y_range] = Chip8::get_GfxRange();
 
-    for (int y = 0; y < y_range; ++y)
+    for (unsigned int y = 0; y < y_range; ++y)
     {
-        for (int x = 0; x < x_range; ++x)
+        for (unsigned int x = 0; x < x_range; ++x)
         {
             if (gfx[x][y] == 0)
                 printf(" ");
@@ -453,9 +453,9 @@ void Chip8::zeroOp()
 //Clears the display buffer.
 void Chip8::CLS()
 {
-    for (int x = 0; x < range.x; x++)
+    for (unsigned int x = 0; x < range.x; x++)
     {
-        for (int y = 0; y < range.y; y++)
+        for (unsigned int y = 0; y < range.y; y++)
         {
             gfx[x][y] = 0;
         }
@@ -912,7 +912,7 @@ void Chip8::SCDN()
 {
     int unsigned d_Scroll = opcode & 0x000F;                                //How many lines need to be scrolled. 
 
-    for (int x = 0; x < range.x; x++)
+    for (unsigned int x = 0; x < range.x; x++)
     {
         auto x_gfxOffset = &gfx[x][0];                                      //Sets x_gfxOffset to the address the first [x] element. 
         memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.y - d_Scroll);   //This copies the first d_Scroll elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
@@ -927,19 +927,19 @@ void Chip8::SCR()
 {
     std::array<unsigned char, 128> temparr = { 0 };                         //temporary array to hold a single contiguous line of [y] elements. 
 
-    for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
+    for (unsigned int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
-        for (int xcolumn = 0; xcolumn < range.x; xcolumn++)                 //changes row based on loop iteration. Effectively changes the [x] element.
+        for (unsigned int xcolumn = 0; xcolumn < range.x; xcolumn++)                 //changes row based on loop iteration. Effectively changes the [x] element.
         {   
             auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];        //sets the address of the current [x] and [y] element in memory based on above loops. again, another pointer so we can work on the data.
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
-        for (int xcolumn = 0; xcolumn < range.x; xcolumn++)
+        for (unsigned int xcolumn = 0; xcolumn < range.x; xcolumn++)
         {
             auto y_gfxOffset = &gfx[(xcolumn + 4) % range.x][y % range.y];
             memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
         }
-        for (int xcolumn = 0; xcolumn < 4; xcolumn++)
+        for (unsigned int xcolumn = 0; xcolumn < 4; xcolumn++)
         {
             auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];
             memset(y_gfxOffset, 0, 1);
@@ -954,7 +954,7 @@ void Chip8::SCL()
 {
     std::array<unsigned char, 128> temparr = { 0 };                         //temporary array to hold a single contiguous line of [y] elements. 
 
-    for (int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
+    for (unsigned int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
         for (unsigned int xcolumn = 0; xcolumn < range.x; xcolumn++)        //changes row based on loop iteration. Effectively changes the [x] element.
         {
