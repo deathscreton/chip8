@@ -20,18 +20,19 @@ char const unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is
     0xF0, 0x80, 0xF0, 0x80, 0x80    // F
 };
 
-char const unsigned fontset10[160] =            //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. 
+char const unsigned fontset10[160] =        //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. Two different sets of fontstyles. Either should work.
 {
-        /*0x3C, 0x7E, 0xE7, 0xC3, 0xC3, 0xC3, 0xC3, 0xE7, 0x7E, 0x3C,
-        0x18, 0x38, 0x58, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x3C,
-        0x3E, 0x7F, 0xC3, 0x06, 0x0C, 0x18, 0x30, 0x60, 0xFF, 0xFF,
-        0x3C, 0x7E, 0xC3, 0x03, 0x0E, 0x0E, 0x03, 0xC3, 0x7E, 0x3C,
-        0x06, 0x0E, 0x1E, 0x36, 0x66, 0xC6, 0xFF, 0xFF, 0x06, 0x06,
-        0xFF, 0xFF, 0xC0, 0xC0, 0xFC, 0xFE, 0x03, 0xC3, 0x7E, 0x3C,
-        0x3E, 0x7C, 0xC0, 0xC0, 0xFC, 0xFE, 0xC3, 0xC3, 0x7E, 0x3C,
-        0xFF, 0xFF, 0x03, 0x06, 0x0C, 0x18, 0x30, 0x60, 0x60, 0x60,
-        0x3C, 0x7E, 0xC3, 0xC3, 0x7E, 0x7E, 0xC3, 0xC3, 0x7E, 0x3C,
-        0x3C, 0x7E, 0xC3, 0xC3, 0x7F, 0x3F, 0x03, 0x03, 0x3E, 0x7C*/
+  /*0x3C, 0x7E, 0xE7, 0xC3, 0xC3, 0xC3, 0xC3, 0xE7, 0x7E, 0x3C,
+    0x18, 0x38, 0x58, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x3C,
+    0x3E, 0x7F, 0xC3, 0x06, 0x0C, 0x18, 0x30, 0x60, 0xFF, 0xFF,
+    0x3C, 0x7E, 0xC3, 0x03, 0x0E, 0x0E, 0x03, 0xC3, 0x7E, 0x3C,
+    0x06, 0x0E, 0x1E, 0x36, 0x66, 0xC6, 0xFF, 0xFF, 0x06, 0x06,
+    0xFF, 0xFF, 0xC0, 0xC0, 0xFC, 0xFE, 0x03, 0xC3, 0x7E, 0x3C,
+    0x3E, 0x7C, 0xC0, 0xC0, 0xFC, 0xFE, 0xC3, 0xC3, 0x7E, 0x3C,
+    0xFF, 0xFF, 0x03, 0x06, 0x0C, 0x18, 0x30, 0x60, 0x60, 0x60,
+    0x3C, 0x7E, 0xC3, 0xC3, 0x7E, 0x7E, 0xC3, 0xC3, 0x7E, 0x3C,
+    0x3C, 0x7E, 0xC3, 0xC3, 0x7F, 0x3F, 0x03, 0x03, 0x3E, 0x7C*/
+
     0xF0, 0xF0, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0xF0, 0xF0, // 0
     0x20, 0x20, 0x60, 0x60, 0x20, 0x20, 0x20, 0x20, 0x70, 0x70, // 1
     0xF0, 0xF0, 0x10, 0x10, 0xF0, 0xF0, 0x80, 0x80, 0xF0, 0xF0, // 2
@@ -52,19 +53,18 @@ char const unsigned fontset10[160] =            //Fontset for SCHIP8, 0-F hex, e
 
 Chip8::Chip8()
 {
-    //Using to cutdown on an already lenghty list.
+    //Using to cutdown on an already lengthy list.
     using a = Chip8;
     /*An initializer list that uses a vector of type opFunc to store another initializer lists for struct opFunc initializers. 
     The hiNibble and loNibble variables are used to locate the required function pointer that will populate the struct.*/
     parentFuncTable =
-    {            //0//               //1//                      //2//
-        {"zeroOp", &a::zeroOp}, {"JMP", &a::JMP},       {"CALL", &a::CALL},        
-        {"SEXB", &a::SEXB},     {"SNEXB", &a::SNEXB},   {"SEXY", &a::SEXY},     
-        {"LDXB", &a::LDXB},     {"ADXB", &a::ADXB},     {"eightOp", &a::eightOp},         
-        {"SNEXY", &a::SNEXY},   {"LDI", &a::LDI},       {"JP0B", &a::JP0B},     
-        {"RNDXB", &a::RNDXB},   {"DRWXY", &a::DRWXY},   {"hexEOp", &a::hexEOp}, 
-        {"fOp", &a::fOp},       {"0x0000", &a::XXXX},
-        
+    {            //0//               //1//                              //2//
+        {"zeroOp", &a::zeroOp}, {"JMP", &a::JMP},               {"CALL", &a::CALL},        
+        {"SEXB", &a::SEXB},     {"SNEXB", &a::SNEXB},           {"SEXY", &a::SEXY},     
+        {"LDXB", &a::LDXB},     {"ADXB", &a::ADXB},             {"eightOp", &a::eightOp},         
+        {"SNEXY", &a::SNEXY},   {"LDI", &a::LDI},               {"JP0B", &a::JP0B},     
+        {"RNDXB", &a::RNDXB},   {"DRWXY", &a::DRWXY},           {"hexEOp", &a::hexEOp}, 
+        {"fOp", &a::fOp},       {"Unknown Opcode", &a::XXXX}
     };
 
     /*Initializer list that contains opcodes that can differ based on the parent opcode.*/
@@ -275,12 +275,10 @@ void Chip8::fetch()
 //Find the initial opcode function using the hiNibble. If isValidOP returns true, the nibble is passed to parentFuncTable to initiate the function. If false, it hands off the program to the catch-all function XXXX.
 void Chip8::findFunc()
 {
-    if (isValidOp(hiNibble)) (this->*parentFuncTable[hiNibble].opCo)();
+    if (isValidOp(hiNibble)) 
+        (this->*parentFuncTable[hiNibble].opCo)();
     else
-    {
-        opFunc unknown = { "Unknown Opcode", &Chip8::XXXX };
-        (this->*unknown.opCo)();
-    }
+        (this->*parentFuncTable[16].opCo)();
 }
 
 //Returns true if the nibble provided is apart of a valid opcode.
@@ -442,8 +440,7 @@ void Chip8::zeroOp()
             (this->*childFuncTable[1].opCo)();
             break;
         default:
-            opFunc unknown = { "Unknown Opcode", &Chip8::XXXX };
-            (this->*unknown.opCo)();
+            (this->*parentFuncTable[16].opCo)();
             break;
         }
         break;
@@ -562,8 +559,7 @@ void Chip8::eightOp()
         (this->*childFuncTable[8 + offset].opCo)();
         break;
     default :
-        opFunc unknown = { "Unknown Opcode", &Chip8::XXXX };
-        (this->*unknown.opCo)();
+        (this->*parentFuncTable[16].opCo)();
         break;
     }
 }
@@ -796,8 +792,7 @@ void Chip8::fOp()
         (this->*childFuncTable[11 + offset].opCo)();
         break;
     default:
-        opFunc unknown = { "Unknown Opcode", &Chip8::XXXX };
-        (this->*unknown.opCo)();
+        (this->*parentFuncTable[16].opCo)();
         break;
     }
 }

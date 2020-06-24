@@ -37,7 +37,7 @@ public:
     void hardReset();
 
     //Method used to return values for x and y for the gfx buffer. 
-    auto get_GfxRange() { return Chip8::range; }
+    auto get_GfxRange() { return range; }
 
     //Method responsible for setting chip8 opening variables from argc and argv. 
     bool setOpenParams(const int argc, const char* rom);
@@ -143,7 +143,11 @@ private:
 
     std::string romName;                            //String variable that carries the current ROM in memory.
 
-    struct gfx_range { unsigned int x = 64; unsigned int y = 32; }range;//Stores maximum element amount for x and y value in the gfx buffer. Can have values of 128x64 (highres) or 64x32(lowres).    
+    struct gfx_range                                //Stores maximum element amount for x and y value in the gfx buffer. 
+    {                                               //Can have values of 128x64 (highres) or 64x32(lowres).    
+        unsigned int x = 64;                        
+        unsigned int y = 32; 
+    }range;
 
     int unsigned const FONT_OFFSET = 80;            //Offset for SCHIP8 Fontset.
 

@@ -19,8 +19,8 @@ namespace
     int x_res = 1280;
     int y_res = 720;
 
-    float x_scale;
-    float y_scale;
+    float x_scale = 0.0f;
+    float y_scale = 0.0f;
 }
 
 //MAIN VARIABLE END//
