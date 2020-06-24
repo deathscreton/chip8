@@ -14,7 +14,7 @@ void pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::RectangleShape& 
 {
     auto [x_range, y_range] = chip8.get_GfxRange();
     
-    sf::Vector2f v_Scale((x_res / x_range), (y_res / y_range));
+    sf::Vector2f v_Scale((float(x_res) / x_range), (float(y_res) / y_range));
     chip8SpriteRect.setSize(v_Scale);
 
     //x_scale = x_res / x_range;
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     sf::SoundBuffer beepBuffer; //Creates sound buffer to hold beep.wav file.
     sf::Sound beepSound; //Creates sound object to control buffer playback.
     sf::RenderWindow mainWindow(sf::VideoMode(x_res, y_res), "Chip 8 Emulator"); //Create and declare Window object for rendering.
-    sf::RectangleShape chip8SpriteRect(sf::Vector2f(10, 11.25)); //Create RectangleShape object with a size of scale factor.
+    sf::RectangleShape chip8SpriteRect; //Create RectangleShape object with a size of scale factor.
 
     //OBJECT INITIALIZATION END//
 
