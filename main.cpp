@@ -22,7 +22,7 @@ void pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::RectangleShape& 
         for (unsigned int x = 0; x < x_range; ++x)
         {
             //this if statement is not properly containing the float for the quotient of y_res / y_range. This needs to be debugged. 
-            if (chip8.gfx[x][y] == 1) chip8SpriteRect.setPosition(x * x_scale, y * 11.25f ); //Multiply the position value by the scale factor so nothing overlaps and the array scales.
+            if (chip8.gfx[x][y] == 1) chip8SpriteRect.setPosition(x * x_scale, y * y_scale ); //Multiply the position value by the scale factor so nothing overlaps and the array scales.
             
             mainWindow.draw(chip8SpriteRect);
         }
@@ -52,7 +52,10 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
                 break;
             }
         }
-        if (!chip8.isPaused) chip8.emulateCycle();
+        for (int clockCycle = 0; clockCycle <= 9; clockCycle++)
+        {
+            if (!chip8.isPaused) chip8.emulateCycle();
+        }
         if (chip8.quitFlag) mainWindow.close();
         if (chip8.drawFlag)
         {
