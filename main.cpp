@@ -53,6 +53,7 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
             }
         }
         if (!chip8.isPaused) chip8.emulateCycle();
+        if (chip8.quitFlag) mainWindow.close();
         if (chip8.drawFlag)
         {
             mainWindow.clear(sf::Color::Black);
