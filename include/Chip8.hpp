@@ -1,10 +1,16 @@
 #ifndef CHIP8_HPP
 #define CHIP8_HPP
 
+#include <iostream>
+#include <array>
+#include <string>
+#include <fstream>
+#include <cstdlib>
+#include <vector>
+
 class Chip8
 {
 public:
-    
     ///////////////////////
     //PUBLIC METHODS
     ///////////////////////
@@ -30,6 +36,9 @@ public:
     //Resets program and clears ALL memory. Reruns loadRom function. 
     void hardReset();
 
+    //Method used to return values for x and y for the gfx buffer. 
+    auto get_GfxRange() { return range; }
+
     //Method responsible for setting chip8 opening variables from argc and argv. 
     bool setOpenParams(const int argc, const char* rom);
 
@@ -37,11 +46,14 @@ public:
     ///PUBLIC MEMBER VARIABLES
     ///////////////////////
 
-    bool drawFlag;                                     //Determines if something was written to the display buffer and needs to be pushed.
-    bool playSound;                                    //Determines if the beep sound is ready to play. 
+    bool drawFlag;                                              //Determines if something was written to the display buffer and needs to be pushed.
+    bool playSound;                                             //Determines if the beep sound is ready to play. 
+    bool quitFlag;                                              //Determines if the program/interpreter requested the application to quit. Currently closes application, but may change it to reset instead.
+    bool superFlag;                                             //Determines if the system should use highres (true) or lowres (false).
+    bool isPaused;                                              //quick flag to pause emulation when running. This will eventually be turned into a full fledge debugger.
 
-    char unsigned gfx[64][32]{0,0};                    //Screen buffer, 2048 pixels total. Switched to a 2D array, last buffer used 1D array with a 64 multiple offset for the y value.
-    char unsigned key[16]{0};                          //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
+    std::array<std::array<char, 64>, 128> gfx = { 0,0 };        //Screen buffer. Uses extended buffer range for both CHIP8 and SCHIP roms. Using std container for array to make use of container members. 
+    char unsigned key[16]{ 0 };                                 //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
 
 private:
 
@@ -53,7 +65,7 @@ private:
     };
 
     //Defines the offset required to select the proper childOpcode based on the parentOpcode.
-    enum childFuncOffset { noOffset = 0, opCode8 = 2, opCodeE = 11, opCodeF = 13, } offset;
+    enum class childFuncOffset { noOffset = 0, opCode8 = 9, opCodeE = 18, opCodeF = 20, };
 
     //Stores intializer lists of type 'opFunc' that contain pointers to a certain function. 
     std::vector<opFunc> parentFuncTable;
@@ -75,13 +87,13 @@ private:
     bool isValidOp(const char &nibble);
 
     //Checks to see if a sound needs to be played. If so, returns true.
-    bool isSoundReady();
+    bool isSoundReady() { return soundTimer == 1; }
 
     //Function responsible for returning the offset value based on the child opcode function requested by the loNibble.
-    enum childFuncOffset getOffset();
+    enum class childFuncOffset getOffset();
 
     ///////////////////////
-    ///OPCODE FUNCTION DECLARATIONS
+    ///ORIGINAL CHIP8 OPCODE FUNCTION DECLARATIONS
     ///////////////////////
 
     void zeroOp();  void CLS();     void RET();
@@ -99,6 +111,15 @@ private:
     void LDIX();    void LDXI();    void XXXX();
 
     ///////////////////////
+    ///SUPER CHIP8 OPCODE FUNCTION DECLARATIONS
+    ///////////////////////
+
+    void SCUN();    void SCDN();    void SCR();
+    void SCL();     void EXIT();    void LOW();
+    void HIGH();    void LDISC();   void LDRVX();
+    void LDVXR();
+
+    ///////////////////////
     ///PRIVATE MEMBER VARIABLES
     ///////////////////////
 
@@ -107,6 +128,7 @@ private:
     short unsigned openArg;                         //Object member that stores argc values.
 
     char unsigned V[16];                            //registers from V0 to VF, with VF being used for flags
+    char unsigned RPL_FLAGS[7];                     //RPL Flags used by SCHIP games. 
 
     short unsigned I = 0;                           //Address Register used as an index to keep track of placement in memory.
     short unsigned pc = 0;                          //Program Counter used to keep track of where we are in the memory.
@@ -120,6 +142,14 @@ private:
     char unsigned soundTimer = 0;                   //Sound variable. Counts down at 60 Hz. Rings at non-zero.
 
     std::string romName;                            //String variable that carries the current ROM in memory.
+
+    struct gfx_range                                //Stores maximum element amount for x and y value in the gfx buffer. 
+    {                                               //Can have values of 128x64 (highres) or 64x32(lowres).    
+        unsigned int x = 64;                        
+        unsigned int y = 32; 
+    }range;
+
+    int unsigned const FONT_OFFSET = 80;            //Offset for SCHIP8 Fontset.
 
 }; //Class Chip8
 
