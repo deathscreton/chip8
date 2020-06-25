@@ -1,10 +1,9 @@
 # chip8
-A chip8 emulator coded in C++ using SFML 2.5.1.
+A Chip8/SCHIP8 emulator coded in C++ using SFML 2.5.1.
 
-The functionality of the core emulator is there. It will run Chip8 games and control them, and make a beep noise when appropriate. SCHIP functionality is currenty in development.
-
+The functionality of the core emulator is there. It will run Chip8 and SCHIP games and control them, and make a beep noise when appropriate.
 To load a ROM, either drag and drop a ROM file onto the exe, or open run the "Chip8 Emulator.exe" file and provide the program with
-a absolute pathfile: "C:\Roms\INVADERS.c8". The extension of the file does not matter.
+a absolute pathfile: "C:\Roms\INVADERS.c8". The extension of the file does not matter. Do not include any quotes in the path.
 
 You control the program using the keys below:
 
@@ -12,7 +11,7 @@ You control the program using the keys below:
  qwer
  asdf'
  
- F1 soft restarts the game, allowing you to restart the game from the beginning. F2 hard resets the program, allowing you to choose a new ROM. ESC is used to quit during play. 
+F1 soft restarts the game, allowing you to restart the game from the beginning. F2 hard resets the program, allowing you to choose a new ROM. ESC is used to quit during play. Pressing "Space" will pause emulation.
 
 You can ignore the VS19 solution files if you use a different IDE.
 
