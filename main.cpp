@@ -16,15 +16,11 @@ void pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::RectangleShape& 
     
     sf::Vector2f v_Scale((float(x_res) / x_range), (float(y_res) / y_range));
     chip8SpriteRect.setSize(v_Scale);
-
-    //x_scale = x_res / x_range;
-    //y_scale = y_res / y_range;
     
-    for (unsigned int y = 0; y < y_range; ++y)
+    for (uint32_t y = 0; y < y_range; ++y)
     {
-        for (unsigned int x = 0; x < x_range; ++x)
+        for (uint32_t x = 0; x < x_range; ++x)
         {
-            //this if statement is not properly containing the float for the quotient of y_res / y_range. This needs to be debugged. 
             if (chip8.gfx[x][y] == 1) chip8SpriteRect.setPosition(x * v_Scale.x, y * v_Scale.y); //Multiply the position value by the scale factor so nothing overlaps and the array scales.
             
             mainWindow.draw(chip8SpriteRect);
@@ -55,7 +51,7 @@ void emulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, 
                 break;
             }
         }
-        for (int clockCycle = 0; clockCycle <= 9; clockCycle++)
+        for (uint32_t clockCycle = 0; clockCycle <= 9; clockCycle++)
         {
             if (!chip8.isPaused) chip8.emulateCycle();
         }

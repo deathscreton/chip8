@@ -16,8 +16,9 @@ extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
 
 namespace
 {
-    int x_res = 1280;
-    int y_res = 720;
+    
+    uint32_t x_res = 1280;
+    uint32_t y_res = 720;
 
     float x_scale = 0.0f;
     float y_scale = 0.0f;

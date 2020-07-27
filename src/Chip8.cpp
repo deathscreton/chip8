@@ -1,6 +1,6 @@
 #include "Chip8.hpp"
 
-char const unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is five bytes.
+uint8_t const fontset[80] =             //Fontset, 0-F hex, each sprite is five bytes.
 {
     0xF0, 0x90, 0x90, 0x90, 0xF0,   // 0
     0x20, 0x60, 0x20, 0x20, 0x70,   // 1
@@ -20,19 +20,8 @@ char const unsigned fontset[80] =             //Fontset, 0-F hex, each sprite is
     0xF0, 0x80, 0xF0, 0x80, 0x80    // F
 };
 
-char const unsigned fontset10[160] =        //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. Two different sets of fontstyles. Either should work.
+uint8_t const fontset10[160] =        //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. Two different sets of fontstyles. Either should work.
 {
-  /*0x3C, 0x7E, 0xE7, 0xC3, 0xC3, 0xC3, 0xC3, 0xE7, 0x7E, 0x3C,
-    0x18, 0x38, 0x58, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x3C,
-    0x3E, 0x7F, 0xC3, 0x06, 0x0C, 0x18, 0x30, 0x60, 0xFF, 0xFF,
-    0x3C, 0x7E, 0xC3, 0x03, 0x0E, 0x0E, 0x03, 0xC3, 0x7E, 0x3C,
-    0x06, 0x0E, 0x1E, 0x36, 0x66, 0xC6, 0xFF, 0xFF, 0x06, 0x06,
-    0xFF, 0xFF, 0xC0, 0xC0, 0xFC, 0xFE, 0x03, 0xC3, 0x7E, 0x3C,
-    0x3E, 0x7C, 0xC0, 0xC0, 0xFC, 0xFE, 0xC3, 0xC3, 0x7E, 0x3C,
-    0xFF, 0xFF, 0x03, 0x06, 0x0C, 0x18, 0x30, 0x60, 0x60, 0x60,
-    0x3C, 0x7E, 0xC3, 0xC3, 0x7E, 0x7E, 0xC3, 0xC3, 0x7E, 0x3C,
-    0x3C, 0x7E, 0xC3, 0xC3, 0x7F, 0x3F, 0x03, 0x03, 0x3E, 0x7C*/
-
     0xF0, 0xF0, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0xF0, 0xF0, // 0
     0x20, 0x20, 0x60, 0x60, 0x20, 0x20, 0x20, 0x20, 0x70, 0x70, // 1
     0xF0, 0xF0, 0x10, 0x10, 0xF0, 0xF0, 0x80, 0x80, 0xF0, 0xF0, // 2
@@ -98,32 +87,32 @@ Chip8::Chip8()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < 128; x++)
-        for (int y = 0; y < 64; y++)
+    for (uint32_t x = 0; x < 128; x++)
+        for (uint32_t y = 0; y < 64; y++)
             gfx[x][y] = 0;
 
     //nulls memory for initialization
-    for (int x = 0; x < 4096; x++)
+    for (uint32_t x = 0; x < 4096; x++)
         memory[x] = 0;
 
     //fill memory with chip8 fontset
-    for (int x = 0; x < 80; x++)
+    for (uint32_t x = 0; x < 80; x++)
         memory[x] = fontset[x];
 
     //fill memory with schip8 fontset
-    for (int x = 0; x < 160; x++)
+    for (uint32_t x = 0; x < 160; x++)
         memory[x + 80] = fontset10[x];
 
     //nulls the stack
-    for (int x = 0; x < 16; x++)
+    for (uint32_t x = 0; x < 16; x++)
         emuStack[x] = 0;
 
     //nulls all registers
-    for (int x = 0; x < 16; x++)
+    for (uint32_t x = 0; x < 16; x++)
         V[x] = 0;
 
     //clears all user HP flags
-    for (int x = 0; x < 7; x++)
+    for (uint32_t x = 0; x < 7; x++)
         RPL_FLAGS[x] = 0;
 
     playSound = false;
@@ -154,24 +143,24 @@ void Chip8::softReset()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < 128; x++)
-        for (int y = 0; y < 64; y++)
+    for (uint32_t x = 0; x < 128; x++)
+        for (uint32_t y = 0; y < 64; y++)
             gfx[x][y] = 0;
 
     //nulls the stack
-    for (int x = 0; x < 16; x++)
+    for (uint32_t x = 0; x < 16; x++)
         emuStack[x] = 0;
 
     //nulls all registers
-    for (int x = 0; x < 16; x++)
+    for (uint32_t x = 0; x < 16; x++)
         V[x] = 0;
 
     //clears all key registers
-    for (int x = 0; x < 16; x++)
+    for (uint32_t x = 0; x < 16; x++)
         key[x] = 0;
 
     //clears all user HP flags
-    for (int x = 0; x < 7; x++)
+    for (uint32_t x = 0; x < 7; x++)
         RPL_FLAGS[x] = 0;
 
     playSound = false;
@@ -198,36 +187,36 @@ void Chip8::hardReset()
     soundTimer = 0;
 
     //clears screen buffer
-    for (int x = 0; x < 128; x++)
-        for (int y = 0; y < 64; y++)
+    for (uint32_t x = 0; x < 128; x++)
+        for (uint32_t y = 0; y < 64; y++)
             gfx[x][y] = 0;
 
     //nulls memory for initialization
-    for (int x = 0; x < 4096; x++)
+    for (uint32_t x = 0; x < 4096; x++)
         memory[x] = 0;
 
     //fill memory with fontset
-    for (int x = 0; x < 80; x++)
+    for (uint32_t x = 0; x < 80; x++)
         memory[x] = fontset[x];
 
     //fill memory with schip8 fontset
-    for (int x = 0; x < 160; x++)
+    for (uint32_t x = 0; x < 160; x++)
         memory[x + 80] = fontset10[x];
 
     //nulls the stack
-    for (int x = 0; x < 16; x++)
+    for (uint32_t x = 0; x < 16; x++)
         emuStack[x] = 0;
 
     //nulls all registers
-    for (int x = 0; x < 16; x++)
+    for (uint32_t x = 0; x < 16; x++)
         V[x] = 0;
 
     //clears all key registers
-    for (int x = 0; x < 16; x++)
+    for (uint32_t x = 0; x < 16; x++)
         key[x] = 0;
 
     //clears all user HP flags
-    for (int x = 0; x < 7; x++)
+    for (uint32_t x = 0; x < 7; x++)
         RPL_FLAGS[x] = 0;
 
     playSound = false;
@@ -282,13 +271,13 @@ void Chip8::findFunc()
 }
 
 //Returns true if the nibble provided is apart of a valid opcode.
-bool Chip8::isValidOp(const char &nibble)
+bool Chip8::isValidOp(const uint8_t &nibble)
 {
     return (0x00 <= nibble && nibble <= 0xF);
 }
 
 //Method responsible for setting chip8 opening variables from argc and argv. 
-bool Chip8::setOpenParams(const int argc, const char* rom)
+bool Chip8::setOpenParams(const uint32_t argc, const char* rom)
 {
     //Check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
     if (argc < 2)
@@ -320,7 +309,7 @@ bool Chip8::loadROM()
 
     //get rom file size
     romfile.seekg(0L, std::ios::end);
-    const int unsigned fsize = romfile.tellg();
+    uint32_t const fsize = romfile.tellg();
     romfile.seekg(0L, std::ios::beg);
     std::cout << romName << " is " << fsize << " bytes. \n";
 
@@ -344,7 +333,7 @@ bool Chip8::loadROM()
     //write buffer to memory
     if ((4096 - 512) > fsize)
     {
-        for (unsigned int pos = 0; pos < fsize; pos++)
+        for (uint32_t pos = 0; pos < fsize; pos++)
         {
             memory[0x200 + pos] = romBuffer[pos];
         }
@@ -384,9 +373,9 @@ void Chip8::debugRender()
 {
     auto [x_range, y_range] = Chip8::get_GfxRange();
 
-    for (unsigned int y = 0; y < y_range; ++y)
+    for (uint32_t y = 0; y < y_range; ++y)
     {
-        for (unsigned int x = 0; x < x_range; ++x)
+        for (uint32_t x = 0; x < x_range; ++x)
         {
             if (gfx[x][y] == 0)
                 printf(" ");
@@ -450,9 +439,9 @@ void Chip8::zeroOp()
 //Clears the display buffer.
 void Chip8::CLS()
 {
-    for (unsigned int x = 0; x < range.x; x++)
+    for (uint32_t x = 0; x < range.x; x++)
     {
-        for (unsigned int y = 0; y < range.y; y++)
+        for (uint32_t y = 0; y < range.y; y++)
         {
             gfx[x][y] = 0;
         }
@@ -527,7 +516,7 @@ void Chip8::ADXB()
 //Uses the loNibble to determine which 8XXX opcode to run
 void Chip8::eightOp()
 {
-    int offset = static_cast<int>(getOffset());//possibly move to inside parent opcodes that call a child opcode
+    uint32_t offset = static_cast<uint32_t>(getOffset());//possibly move to inside parent opcodes that call a child opcode
 
     switch (loNibble & 0x0F)
     {
@@ -689,21 +678,21 @@ void Chip8::DRWXY()
         bits = 16; 
         mask = 0x8000;
 
-        for (int index = 0; index < 32; index += 2)
+        for (uint32_t index = 0; index < 32; index += 2)
         {
             pixel.push_back(memory[I + index] << 8 | memory[I + index + 1]); //twobyte sprite load is similar to opcode load.
         }
     }
     else //otherwise, loads regular byte sprite into memory.
     {
-        for(int index = 0; index < height; index++)
+        for(uint32_t index = 0; index < height; index++)
         {
             pixel.push_back(memory[I + index]);
         }
     }
-    for (int yline = 0; yline < height; yline++)//loop for however many rows there are which is determined by 'height'
+    for (uint32_t yline = 0; yline < height; yline++)//loop for however many rows there are which is determined by 'height'
     {
-        for (int xline = 0; xline < bits; xline++)//loop for all eight bits, sixteen if using schip8 draw function
+        for (uint32_t xline = 0; xline < bits; xline++)//loop for all eight bits, sixteen if using schip8 draw function
         {
             if ((pixel[yline] & (mask >> xline)) != 0)//scans the bits one at a time. if the current bit is 1, then it needs to be checked for collision. shifts bits to the right based on loop iteration.
             {
@@ -722,7 +711,7 @@ void Chip8::DRWXY()
 //Exnn: Determines what 'Exnn' opcode to branch to based on nn.
 void Chip8::hexEOp()
 {
-    int offset = static_cast<int>(getOffset());//possibly move to inside parent opcodes that call a child opcode
+    uint32_t offset = static_cast<uint32_t>(getOffset());//possibly move to inside parent opcodes that call a child opcode
 
     if (loNibble == 0x9E)
         (this->*childFuncTable[0 + offset].opCo)();
@@ -751,7 +740,7 @@ void Chip8::SKNPX()
 //Uses the entire loNibble to determine what FXXX opcode function to run. 
 void Chip8::fOp()
 {
-    int offset = static_cast<int>(getOffset());//possibly move to inside parent opcodes that call a child opcode
+    uint32_t offset = static_cast<uint32_t>(getOffset());//possibly move to inside parent opcodes that call a child opcode
 
     switch (loNibble)
     {    
@@ -809,7 +798,7 @@ void Chip8::LDXK()
 {
     bool keyPressed = false;
 
-    for (int pos = 0; pos < 16; pos++)
+    for (uint32_t pos = 0; pos < 16; pos++)
     {
         if (key[pos] != 0)
         {
@@ -857,7 +846,7 @@ void Chip8::LDFX()
 //Fx33: Store BCD representation of Vx in memory locations I, I+1 and I+2. 
 void Chip8::LDBX()
 {
-    int BCD = V[(opcode & 0x0F00) >> 8];
+    uint32_t BCD = V[(opcode & 0x0F00) >> 8];
     memory[I] = (BCD % 1000) / 100;
     memory[I + 1] = (BCD % 100) / 10;
     memory[I + 2] = BCD % 10;
@@ -867,7 +856,7 @@ void Chip8::LDBX()
 //Fx55: Store registers V- through Vx in memory starting a location I. 
 void Chip8::LDIX()
 {
-    for (int mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
+    for (uint32_t mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
     {
         memory[I + mempos] = V[mempos];
     }
@@ -878,7 +867,7 @@ void Chip8::LDIX()
 //Fx65: Read register V0 through Vx from memory starting at location I.
 void Chip8::LDXI()
 {
-    for (int mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
+    for (uint32_t mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
     {
         V[mempos] = memory[I + mempos];
     }
@@ -905,9 +894,9 @@ void Chip8::SCUN()
 //00CN: Scroll display N lines down.
 void Chip8::SCDN()
 {
-    int unsigned d_Scroll = opcode & 0x000F;                                //How many lines need to be scrolled. 
+    uint32_t d_Scroll = opcode & 0x000F;                                //How many lines need to be scrolled. 
 
-    for (unsigned int x = 0; x < range.x; x++)
+    for (uint32_t x = 0; x < range.x; x++)
     {
         auto x_gfxOffset = &gfx[x][0];                                      //Sets x_gfxOffset to the address the first [x] element. 
         memmove(x_gfxOffset + d_Scroll, x_gfxOffset, range.y - d_Scroll);   //This copies the first d_Scroll elements in contingous memory starting at x_gfxOffset, and pastes it using the same pointer, but with an offset of d_Scroll.
@@ -920,21 +909,21 @@ void Chip8::SCDN()
 //00FB: Scroll display 4 pixels to the right.
 void Chip8::SCR()
 {
-    std::array<unsigned char, 128> temparr = { 0 };                         //temporary array to hold a single contiguous line of [y] elements. 
+    std::array<uint8_t, 128> temparr = { 0 };                         //temporary array to hold a single contiguous line of [y] elements. 
 
-    for (unsigned int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
+    for (uint32_t y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
-        for (unsigned int xcolumn = 0; xcolumn < range.x; xcolumn++)                 //changes row based on loop iteration. Effectively changes the [x] element.
+        for (uint32_t xcolumn = 0; xcolumn < range.x; xcolumn++)                 //changes row based on loop iteration. Effectively changes the [x] element.
         {   
             auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];        //sets the address of the current [x] and [y] element in memory based on above loops. again, another pointer so we can work on the data.
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
-        for (unsigned int xcolumn = 0; xcolumn < range.x; xcolumn++)
+        for (uint32_t xcolumn = 0; xcolumn < range.x; xcolumn++)
         {
             auto y_gfxOffset = &gfx[(xcolumn + 4) % range.x][y % range.y];
             memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
         }
-        for (unsigned int xcolumn = 0; xcolumn < 4; xcolumn++)
+        for (uint32_t xcolumn = 0; xcolumn < 4; xcolumn++)
         {
             auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];
             memset(y_gfxOffset, 0, 1);
@@ -947,21 +936,21 @@ void Chip8::SCR()
 //00FC: Scroll display 4 pixels to the left. 
 void Chip8::SCL()
 {
-    std::array<unsigned char, 128> temparr = { 0 };                         //temporary array to hold a single contiguous line of [y] elements. 
+    std::array<uint8_t, 128> temparr = { 0 };                         //temporary array to hold a single contiguous line of [y] elements. 
 
-    for (unsigned int y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
+    for (uint32_t y = 0; y < range.y; y++)                                       //iterates over every column to provide the proper [y] element. Effectively changes the [y] element.
     {
-        for (unsigned int xcolumn = 0; xcolumn < range.x; xcolumn++)        //changes row based on loop iteration. Effectively changes the [x] element.
+        for (uint32_t xcolumn = 0; xcolumn < range.x; xcolumn++)        //changes row based on loop iteration. Effectively changes the [x] element.
         {
             auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];        //sets the address of the current [x] and [y] element in memory based on above loops. 
             memcpy(temparr.data() + xcolumn, y_gfxOffset, 1);               //stores bytes from the array, one byte at a time for each loop. 
         }
-        for (unsigned int xcolumn = 0; xcolumn < range.x; xcolumn++)
+        for (uint32_t xcolumn = 0; xcolumn < range.x; xcolumn++)
         {
             auto y_gfxOffset = &gfx[(xcolumn - 4) % range.x][y % range.y];
             memcpy(y_gfxOffset, temparr.data() + xcolumn, 1);
         }
-        for (int xcolumn = 127; xcolumn >= 124; xcolumn--)
+        for (uint32_t xcolumn = 127; xcolumn >= 124; xcolumn--)
         {
             auto y_gfxOffset = &gfx[xcolumn % range.x][y % range.y];
             memset(y_gfxOffset, 0, 1);
@@ -1004,7 +993,7 @@ void Chip8::LDISC()
 //FX75: Store V0 through VX to HP-48 RPL user flags (X <= 7).
 void Chip8::LDRVX()
 {
-    for (int mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
+    for (uint32_t mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
     {
         RPL_FLAGS[mempos] = V[mempos];
     }
@@ -1015,7 +1004,7 @@ void Chip8::LDRVX()
 //FX85: Read V0 through VX from HP-48 RPL user flags (X <= 7).
 void Chip8::LDVXR()
 {
-    for (int mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
+    for (uint32_t mempos = 0; mempos <= ((opcode & 0x0F00) >> 8); mempos++)
     {
         V[mempos] = RPL_FLAGS[mempos];
     }

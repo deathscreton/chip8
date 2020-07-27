@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include <cstdlib>
+#include <cstdint>
 #include <vector>
 
 class Chip8
@@ -40,7 +41,7 @@ public:
     auto get_GfxRange() { return range; }
 
     //Method responsible for setting chip8 opening variables from argc and argv. 
-    bool setOpenParams(const int argc, const char* rom);
+    bool setOpenParams(const uint32_t argc, const char* rom);
 
     ///////////////////////
     ///PUBLIC MEMBER VARIABLES
@@ -52,8 +53,8 @@ public:
     bool superFlag;                                             //Determines if the system should use highres (true) or lowres (false).
     bool isPaused;                                              //quick flag to pause emulation when running. This will eventually be turned into a full fledge debugger.
 
-    std::array<std::array<char, 64>, 128> gfx = { 0,0 };        //Screen buffer. Uses extended buffer range for both CHIP8 and SCHIP roms. Using std container for array to make use of container members. 
-    char unsigned key[16]{ 0 };                                 //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
+    std::array<std::array<uint8_t, 64>, 128> gfx = { 0,0 };     //Screen buffer. Uses extended buffer range for both CHIP8 and SCHIP roms. Using std container for array to make use of container members. 
+    uint8_t key[16]{ 0 };                                       //Key buffer that stores the state of a pressed key; the value does not matter. Anything other than 0 indicates a pressed state.
 
 private:
 
@@ -84,7 +85,7 @@ private:
     void findFunc();
 
     //Checks to make sure the opcode being generated is a legal instruction.
-    bool isValidOp(const char &nibble);
+    bool isValidOp(const uint8_t &nibble);
 
     //Checks to see if a sound needs to be played. If so, returns true.
     bool isSoundReady() { return soundTimer == 1; }
@@ -123,33 +124,33 @@ private:
     ///PRIVATE MEMBER VARIABLES
     ///////////////////////
 
-    char unsigned memory[4096];                     //4KB of memory used to store the ROM and other bits of important data.
-    short unsigned emuStack[16];                    //Array that emulate the Stack; capable of storing sixteen levels of indirections.
-    short unsigned openArg;                         //Object member that stores argc values.
+    uint8_t memory[4096];                     //4KB of memory used to store the ROM and other bits of important data.
+    uint16_t emuStack[16];                    //Array that emulate the Stack; capable of storing sixteen levels of indirections.
+    uint16_t openArg;                         //Object member that stores argc values.
 
-    char unsigned V[16];                            //registers from V0 to VF, with VF being used for flags
-    char unsigned RPL_FLAGS[7];                     //RPL Flags used by SCHIP games. 
+    uint8_t V[16];                            //registers from V0 to VF, with VF being used for flags
+    uint8_t RPL_FLAGS[7];                     //RPL Flags used by SCHIP games. 
 
-    short unsigned I = 0;                           //Address Register used as an index to keep track of placement in memory.
-    short unsigned pc = 0;                          //Program Counter used to keep track of where we are in the memory.
-    short unsigned sp = 0;                          //Stack Pointer used to store the pc in the stack for temporary jumps.
-    short unsigned opcode = 0x0000;                 //Variable used to store the current opcode being executed.
+    uint16_t I = 0;                           //Address Register used as an index to keep track of placement in memory.
+    uint16_t pc = 0;                          //Program Counter used to keep track of where we are in the memory.
+    uint16_t sp = 0;                          //Stack Pointer used to store the pc in the stack for temporary jumps.
+    uint16_t opcode = 0x0000;                 //Variable used to store the current opcode being executed.
 
-    char unsigned hiNibble = 0x00;                  //Carries the high nibble of the opcode. Used to determine group function.
-    char unsigned loNibble = 0x00;                  //Carries the low nibble of the opcode. Used to determine specific function.
+    uint8_t hiNibble = 0x00;                  //Carries the high nibble of the opcode. Used to determine group function.
+    uint8_t loNibble = 0x00;                  //Carries the low nibble of the opcode. Used to determine specific function.
 
-    char unsigned delayTimer = 0;                   //Timer variable. Counts down at 60 Hz.
-    char unsigned soundTimer = 0;                   //Sound variable. Counts down at 60 Hz. Rings at non-zero.
+    uint8_t delayTimer = 0;                   //Timer variable. Counts down at 60 Hz.
+    uint8_t soundTimer = 0;                   //Sound variable. Counts down at 60 Hz. Rings at non-zero.
 
     std::string romName;                            //String variable that carries the current ROM in memory.
 
     struct gfx_range                                //Stores maximum element amount for x and y value in the gfx buffer. 
     {                                               //Can have values of 128x64 (highres) or 64x32(lowres).    
-        unsigned int x = 64;                        
-        unsigned int y = 32; 
+        uint32_t x = 64;                        
+        uint32_t y = 32; 
     }range;
 
-    int unsigned const FONT_OFFSET = 80;            //Offset for SCHIP8 Fontset.
+    uint32_t const FONT_OFFSET = 80;            //Offset for SCHIP8 Fontset.
 
 }; //Class Chip8
 
