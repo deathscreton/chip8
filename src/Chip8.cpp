@@ -225,12 +225,17 @@ void Chip8::hardReset()
     superFlag = false;
     isPaused = false;
 
-    std::cout << "Enter the absolute ROM file path(extension included): \n";
+    std::cout << "Enter the absolute ROM file path(extension included): \n"; //I need to wrap this in a function so it can be properly passed the information it needs.
     getline(std::cin, romName);
 
 #ifdef _DEBUG
     std::cout << "Current ROM being loaded:" << romName;
 #endif // _DEBUG
+}
+
+void Chip8::writeMem()
+{
+
 }
 
 //Function responsible for a single emulated CPU cycle.
@@ -275,77 +280,6 @@ bool Chip8::isValidOp(const uint8_t &nibble)
 {
     return (0x00 <= nibble && nibble <= 0xF);
 }
-
-//Method responsible for setting chip8 opening variables from argc and argv. 
-bool Chip8::setOpenParams(const uint32_t argc, const char* rom)
-{
-    //Check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
-    if (argc < 2)
-    {
-        std::cout << "Enter the absolute ROM file path(extension included): \n";
-        std::getline(std::cin, romName);
-        return true;
-    }
-    else if (argc == 2)
-    {
-        romName = rom;
-        return true;
-    }
-
-    std::cerr << "Something went terribly wrong when collecting rom name. \n";
-    return false;
-}
-
-//Function responsible for loading program into memory.
-bool Chip8::loadROM()
-{
-    //open rom file using name set by setOpenParams or hardReset
-    std::ifstream romfile(romName.data(), std::ios::binary);
-    if (!romfile)
-    {
-        std::cerr << "Error opening " << romName << ". Please check the name of your file and try again. (You didn't include quotes, did you?) \n";
-        return false;
-    }
-
-    //get rom file size
-    romfile.seekg(0L, std::ios::end);
-    uint32_t const fsize = romfile.tellg();
-    romfile.seekg(0L, std::ios::beg);
-    std::cout << romName << " is " << fsize << " bytes. \n";
-
-    //create buffer using rom size
-    std::vector<char> romBuffer(fsize);
-    if (romBuffer.empty())
-    {
-        std::cerr << "Error creating memory buffer. \n";
-        return false;
-    }
-
-    //write file to buffer
-    romfile.read(romBuffer.data(), fsize);
-    romfile.close();
-    if (romBuffer.size() != fsize)
-    {
-        std::cerr << "Error writing file to buffer. \n";
-        return false;
-    }
-
-    //write buffer to memory
-    if ((4096 - 512) > fsize)
-    {
-        for (uint32_t pos = 0; pos < fsize; pos++)
-        {
-            memory[0x200 + pos] = romBuffer[pos];
-        }
-    }
-    else
-    {
-        std::cerr << "ERROR: ROM file size is too large for memory! \n";
-        return false;
-    }
-    return true;
-}
-
 
 //Supplies an offset for child opcodes that are derived from a parent opcode like 8XXX. This offset is used to determine which opcode function is ran from within vector childFuncTable. 
 enum class Chip8::childFuncOffset Chip8::getOffset()

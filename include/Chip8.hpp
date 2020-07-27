@@ -22,9 +22,6 @@ public:
     //Destructor
     ~Chip8();
 
-    //Function responsible for loading program into memory.
-    bool loadROM();
-    
     //Function responsible for a single emulated CPU cycle.
     void emulateCycle();
 
@@ -37,11 +34,11 @@ public:
     //Resets program and clears ALL memory. Reruns loadRom function. 
     void hardReset();
 
+    //External function that writes to memory.
+    void writeMem();
+
     //Method used to return values for x and y for the gfx buffer. 
     auto get_GfxRange() { return range; }
-
-    //Method responsible for setting chip8 opening variables from argc and argv. 
-    bool setOpenParams(const uint32_t argc, const char* rom);
 
     ///////////////////////
     ///PUBLIC MEMBER VARIABLES
@@ -141,8 +138,6 @@ private:
 
     uint8_t delayTimer = 0;                   //Timer variable. Counts down at 60 Hz.
     uint8_t soundTimer = 0;                   //Sound variable. Counts down at 60 Hz. Rings at non-zero.
-
-    std::string romName;                            //String variable that carries the current ROM in memory.
 
     struct gfx_range                                //Stores maximum element amount for x and y value in the gfx buffer. 
     {                                               //Can have values of 128x64 (highres) or 64x32(lowres).    

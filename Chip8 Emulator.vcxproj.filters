@@ -21,7 +21,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EmuCore.cpp">
+    <ClCompile Include="src\EmuCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,13 +29,10 @@
     <ClInclude Include="include\Chip8.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Init.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\KeyHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuCore.hpp">
+    <ClInclude Include="include\EmuCore.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
