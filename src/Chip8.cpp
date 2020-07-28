@@ -168,10 +168,6 @@ void Chip8::softReset()
     quitFlag = false;
     superFlag = false;
     isPaused = false;
-
-#ifdef _DEBUG
-    std::cout << "Current ROM loaded:" << romName;
-#endif // _DEBUG
 }
 
 void Chip8::hardReset()
@@ -225,15 +221,28 @@ void Chip8::hardReset()
     superFlag = false;
     isPaused = false;
 
-    std::cout << "Enter the absolute ROM file path(extension included): \n"; //I need to wrap this in a function so it can be properly passed the information it needs.
-    getline(std::cin, romName);
-
-#ifdef _DEBUG
-    std::cout << "Current ROM being loaded:" << romName;
-#endif // _DEBUG
+}
+//External function that writes to memory.
+bool Chip8::writeMem(uint32_t fsize, std::vector<char>& romBuffer)
+{
+    if ((4096 - 512) > fsize)
+    {
+        for (uint32_t pos = 0; pos < fsize; pos++)
+        {
+            memory[0x200 + pos] = romBuffer[pos];            
+        }
+    }
+    else
+    {
+        std::cerr << "ERROR: ROM file size is too large for memory! \n";
+        return false;
+    }
+    return true;
 }
 
-void Chip8::writeMem()
+//External function used to read portions of the memory. This is currently empty as it'll be used by the debugger and not much else. 
+//The debugger has yet to be implemented.
+bool Chip8::readMem()
 {
 
 }

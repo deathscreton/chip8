@@ -1,9 +1,7 @@
-#ifndef KEYHANDLER_HPP
+/*#ifndef KEYHANDLER_HPP
 #define KEYHANDLER_HPP
 
-#include "Chip8.hpp"
-
-class EmuCore {};
+#include "EmuCore.hpp"
 
 void EmuCore::keyStateReleased(Chip8& chip8, sf::Event& keyState)
 {
@@ -62,7 +60,7 @@ void EmuCore::keyStateReleased(Chip8& chip8, sf::Event& keyState)
     }
 }
 
-void EmuCore::keyStatePressed(EmuCore& emucore, Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, sf::Sound& beepSound, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect)
+void EmuCore::keyStatePressed(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, sf::Sound& beepSound, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect)
 {
     sf::Event keyState;
     keyState = event;
@@ -74,13 +72,14 @@ void EmuCore::keyStatePressed(EmuCore& emucore, Chip8& chip8, sf::Event& event, 
         break;
     case sf::Keyboard::F1:
         chip8.softReset();
-        emucore.EmulationLoop(chip8, event, beepBuffer, beepSound, mainWindow, chip8SpriteRect);
+        this->EmulationLoop(chip8, event, beepBuffer, beepSound, mainWindow, chip8SpriteRect);
         break;
     case sf::Keyboard::F2:
         mainWindow.clear(sf::Color::Black);
         mainWindow.display();
         chip8.hardReset();
-        emucore.loadROM();
+        this->setRomName(); //setRomName returns a bool, this needs to be tested for safety
+        this->loadROM();
         break;
     case sf::Keyboard::Space: //Pauses emulation if isPaused = false. Otherwise, unpauses emulation.
         chip8.isPaused == true ? chip8.isPaused = false : chip8.isPaused = true;
@@ -138,4 +137,4 @@ void EmuCore::keyStatePressed(EmuCore& emucore, Chip8& chip8, sf::Event& event, 
     }
 }
 
-#endif // KEYHANDLER_HPP
+#endif // KEYHANDLER_HPP*/

@@ -1,14 +1,12 @@
 #include "EmuCore.hpp"
 
-EmuCore::EmuCore()
+
+
+void EmuCore::Init(const uint32_t argc, const char* rom)
 {
-    this->Init();
+    this->StartEmu(argc, rom);
 }
 
-void EmuCore::Init()
-{
-
-}
 
 void EmuCore::StartEmu(const uint32_t argc, const char* rom)
 {
@@ -40,7 +38,7 @@ void EmuCore::StartEmu(const uint32_t argc, const char* rom)
     }
 }
 
-void EmuCore::EmulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, sf::Sound& beepSound, sf::RenderWindow mainWindow, sf::RectangleShape& chip8SpriteRect)
+void EmuCore::EmulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, sf::Sound& beepSound, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect)
 {
     mainWindow.setFramerateLimit(60);
 
@@ -94,7 +92,7 @@ void EmuCore::pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::Rectang
 {
     auto [x_range, y_range] = chip8.get_GfxRange();
 
-    sf::Vector2f v_Scale((float(x_res) / x_range), (float(y_res) / y_range));
+    sf::Vector2f v_Scale((float(coreRes.x_res) / x_range), (float(coreRes.y_res) / y_range));
     chip8SpriteRect.setSize(v_Scale);
 
     for (uint32_t y = 0; y < y_range; ++y)
@@ -114,9 +112,7 @@ bool EmuCore::setOpenParams(const uint32_t argc, const char* rom)
     //Check to see if program was opened via command line with an argument (or drag and drop) or via GUI/File Explorer.
     if (argc < 2)
     {
-        std::cout << "Enter the absolute ROM file path(extension included): \n";
-        std::getline(std::cin, romName);
-        return true;
+        if(this->setRomName()) return true;
     }
     else if (argc == 2)
     {
@@ -126,6 +122,14 @@ bool EmuCore::setOpenParams(const uint32_t argc, const char* rom)
 
     std::cerr << "Something went terribly wrong when collecting rom name. \n";
     return false;
+}
+
+//Function to set romName string.
+bool EmuCore::setRomName()
+{
+    std::cout << "Enter the absolute ROM file path(extension included): \n";
+    std::getline(std::cin, romName);
+    return true;
 }
 
 //Function responsible for loading program into memory.
@@ -163,18 +167,153 @@ bool EmuCore::loadROM()
     }
 
     //write buffer to memory
-    if ((4096 - 512) > fsize)
+    if (chip8.writeMem(fsize, romBuffer))
     {
-        for (uint32_t pos = 0; pos < fsize; pos++)
-        {
-            //chip8.memory[0x200 + pos] = romBuffer[pos];
-            chip8.writeMem();
-        }
-    }
-    else
-    {
-        std::cerr << "ERROR: ROM file size is too large for memory! \n";
+        std::cerr << "Something went terribly wrong writing to buffer. \n";
         return false;
     }
-    return true;
+}
+
+void EmuCore::keyStateReleased(Chip8& chip8, sf::Event& keyState)
+{
+    switch (keyState.key.code)
+    {
+    case sf::Keyboard::Num1:
+        chip8.key[0x1] = 0;
+        break;
+    case sf::Keyboard::Num2:
+        chip8.key[0x2] = 0;
+        break;
+    case sf::Keyboard::Num3:
+        chip8.key[0x3] = 0;
+        break;
+    case sf::Keyboard::Num4:
+        chip8.key[0xC] = 0;
+        break;
+    case sf::Keyboard::Q:
+        chip8.key[0x4] = 0;
+        break;
+    case sf::Keyboard::W:
+        chip8.key[0x5] = 0;
+        break;
+    case sf::Keyboard::E:
+        chip8.key[0x6] = 0;
+        break;
+    case sf::Keyboard::R:
+        chip8.key[0xD] = 0;
+        break;
+    case sf::Keyboard::A:
+        chip8.key[0x7] = 0;
+        break;
+    case sf::Keyboard::S:
+        chip8.key[0x8] = 0;
+        break;
+    case sf::Keyboard::D:
+        chip8.key[0x9] = 0;
+        break;
+    case sf::Keyboard::F:
+        chip8.key[0xE] = 0;
+        break;
+    case sf::Keyboard::Z:
+        chip8.key[0xA] = 0;
+        break;
+    case sf::Keyboard::X:
+        chip8.key[0x0] = 0;
+        break;
+    case sf::Keyboard::C:
+        chip8.key[0xB] = 0;
+        break;
+    case sf::Keyboard::V:
+        chip8.key[0xF] = 0;
+        break;
+    default:
+        break;
+    }
+}
+
+void EmuCore::keyStatePressed(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, sf::Sound& beepSound, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect)
+{
+    sf::Event keyState;
+    keyState = event;
+
+    switch (keyState.key.code)
+    {
+    case sf::Keyboard::Escape:
+        mainWindow.close();
+        break;
+    case sf::Keyboard::F1:
+        chip8.softReset();
+
+#ifdef _DEBUG
+        std::cout << "Current ROM loaded:" << romName;
+#endif // _DEBUG
+
+        this->EmulationLoop(chip8, event, beepBuffer, beepSound, mainWindow, chip8SpriteRect);
+        break;
+    case sf::Keyboard::F2:
+        mainWindow.clear(sf::Color::Black);
+        mainWindow.display();
+        chip8.hardReset();
+        this->setRomName(); //setRomName returns a bool, this needs to be tested for safety
+
+#ifdef _DEBUG
+        std::cout << "Current ROM being loaded:" << romName;
+#endif // _DEBUG
+
+        this->loadROM();
+        break;
+    case sf::Keyboard::Space: //Pauses emulation if isPaused = false. Otherwise, unpauses emulation.
+        chip8.isPaused == true ? chip8.isPaused = false : chip8.isPaused = true;
+        break;
+    case sf::Keyboard::Num1:
+        chip8.key[0x1] = 1;
+        break;
+    case sf::Keyboard::Num2:
+        chip8.key[0x2] = 1;
+        break;
+    case sf::Keyboard::Num3:
+        chip8.key[0x3] = 1;
+        break;
+    case sf::Keyboard::Num4:
+        chip8.key[0xC] = 1;
+        break;
+    case sf::Keyboard::Q:
+        chip8.key[0x4] = 1;
+        break;
+    case sf::Keyboard::W:
+        chip8.key[0x5] = 1;
+        break;
+    case sf::Keyboard::E:
+        chip8.key[0x6] = 1;
+        break;
+    case sf::Keyboard::R:
+        chip8.key[0xD] = 1;
+        break;
+    case sf::Keyboard::A:
+        chip8.key[0x7] = 1;
+        break;
+    case sf::Keyboard::S:
+        chip8.key[0x8] = 1;
+        break;
+    case sf::Keyboard::D:
+        chip8.key[0x9] = 1;
+        break;
+    case sf::Keyboard::F:
+        chip8.key[0xE] = 1;
+        break;
+    case sf::Keyboard::Z:
+        chip8.key[0xA] = 1;
+        break;
+    case sf::Keyboard::X:
+        chip8.key[0x0] = 1;
+        break;
+    case sf::Keyboard::C:
+        chip8.key[0xB] = 1;
+        break;
+    case sf::Keyboard::V:
+        chip8.key[0xF] = 1;
+        break;
+    default:
+        break;
+    }
 }

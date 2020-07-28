@@ -15,7 +15,7 @@ extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
 int main(int argc, char* argv[])
 {
     EmuCore emucore;
-    emucore.StartEmu(argc, argv[1]);
+    emucore.Init(argc, argv[1]);
 
     return 0;
 }

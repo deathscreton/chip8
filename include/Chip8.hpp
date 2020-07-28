@@ -35,7 +35,11 @@ public:
     void hardReset();
 
     //External function that writes to memory.
-    void writeMem();
+    bool writeMem(uint32_t fsize, std::vector<char>& romBuffer);
+
+    //External function used to read portions of the memory. This is currently empty as it'll be used by the debugger and not much else. 
+    //The debugger has yet to be implemented.
+    bool readMem();
 
     //Method used to return values for x and y for the gfx buffer. 
     auto get_GfxRange() { return range; }
@@ -139,8 +143,8 @@ private:
     uint8_t delayTimer = 0;                   //Timer variable. Counts down at 60 Hz.
     uint8_t soundTimer = 0;                   //Sound variable. Counts down at 60 Hz. Rings at non-zero.
 
-    struct gfx_range                                //Stores maximum element amount for x and y value in the gfx buffer. 
-    {                                               //Can have values of 128x64 (highres) or 64x32(lowres).    
+    struct gfx_range                          //Stores maximum element amount for x and y value in the gfx buffer. 
+    {                                         //Can have values of 128x64 (highres) or 64x32(lowres).    
         uint32_t x = 64;                        
         uint32_t y = 32; 
     }range;
