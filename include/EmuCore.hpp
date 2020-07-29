@@ -11,26 +11,16 @@
 #include "SFML\Audio.hpp"
 
 #include "Chip8.hpp"
-#include "KeyHandler.hpp"
 
 class EmuCore
 {
-private:
 
-	Chip8 chip8; //Creates emulator object and initializes class state using constructor
-	sf::Event event; //Creates event object to contain event types necessary for interactivity.
-	sf::SoundBuffer beepBuffer; //Creates sound buffer to hold beep.wav file.
-	sf::Sound beepSound; //Creates sound object to control buffer playback.
-	sf::RenderWindow mainWindow; //Create and declare Window object for rendering.
-	sf::RectangleShape chip8SpriteRect; //Create RectangleShape object with a size of scale factor.
 
 public:
 	//METHODS//
 
-	EmuCore() : mainWindow(sf::VideoMode(1280, 720), "Chip 8 Emulator")
-	{
-
-	}
+	//Default constructor.
+	EmuCore();
 
 	//Creates members then calls StartEmu. 
 	void Init(const uint32_t argc, const char* rom);
@@ -40,6 +30,14 @@ public:
 
 private:
 
+	//OBJECTS//
+
+	Chip8 chip8; //Creates emulator object and initializes class state using constructor
+	sf::Event event; //Creates event object to contain event types necessary for interactivity.
+	sf::SoundBuffer beepBuffer; //Creates sound buffer to hold beep.wav file.
+	sf::Sound beepSound; //Creates sound object to control buffer playback.
+	sf::RenderWindow mainWindow{sf::VideoMode(1280, 720), "Chip 8 Emulator"}; //Create and initalize a Window object for rendering.
+	sf::RectangleShape chip8SpriteRect; //Create RectangleShape object with a size of scale factor.
 
 	//METHODS//
 
@@ -67,7 +65,7 @@ private:
 	//MEMBERS//
 
 	//Struct that contains the members responsible for holding the current resolution value. This defaults to 720p.
-	struct currentRes 
+	struct currentRes
 	{
 		uint32_t x_res = 1280;
 		uint32_t y_res = 720;

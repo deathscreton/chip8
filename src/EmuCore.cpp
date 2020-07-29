@@ -1,7 +1,5 @@
 #include "EmuCore.hpp"
 
-
-
 void EmuCore::Init(const uint32_t argc, const char* rom)
 {
     this->StartEmu(argc, rom);
