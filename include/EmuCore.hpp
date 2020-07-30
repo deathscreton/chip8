@@ -42,16 +42,16 @@ private:
 	//METHODS//
 
 	//Handles the events and cpu cycles.
-	void EmulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, sf::Sound& beepSound, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect);
+	void EmulationLoop();
 
 	//Handles drawing to the screen using gfx array and SFML drawing functions.
-	void pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect);
+	void pushBuffer();
 
 	//Detects key release.
-	void keyStateReleased(Chip8& chip8, sf::Event& keyState);
+	void keyStateReleased();
 
 	//Detects key presses.
-	void keyStatePressed(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, sf::Sound& beepSound, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect);
+	void keyStatePressed();
 
 	//Method responsible for setting chip8 opening variables from argc and argv. 
 	bool setOpenParams(const uint32_t argc, const char* rom);

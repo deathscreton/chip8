@@ -20,7 +20,7 @@ void EmuCore::StartEmu(const uint32_t argc, const char* rom)
             {
                 beepSound.setBuffer(beepBuffer);
             }
-            this->EmulationLoop(chip8, event, beepBuffer, beepSound, mainWindow, chip8SpriteRect);
+            this->EmulationLoop();
         }
         else
         {
@@ -36,7 +36,7 @@ void EmuCore::StartEmu(const uint32_t argc, const char* rom)
     }
 }
 
-void EmuCore::EmulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, sf::Sound& beepSound, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect)
+void EmuCore::EmulationLoop()
 {
     mainWindow.setFramerateLimit(60);
 
@@ -50,10 +50,10 @@ void EmuCore::EmulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& bee
                 mainWindow.close();
                 break;
             case sf::Event::KeyPressed:
-                keyStatePressed(chip8, event, beepBuffer, beepSound, mainWindow, chip8SpriteRect);
+                keyStatePressed();
                 break;
             case sf::Event::KeyReleased:
-                keyStateReleased(chip8, event);
+                keyStateReleased();
                 break;
             default:
                 break;
@@ -68,7 +68,7 @@ void EmuCore::EmulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& bee
         {
             mainWindow.clear(sf::Color::Black);
 
-            pushBuffer(chip8, mainWindow, chip8SpriteRect);
+            pushBuffer();
 
 #ifdef _DEBUG
             //chip8.debugRender();
@@ -86,7 +86,7 @@ void EmuCore::EmulationLoop(Chip8& chip8, sf::Event& event, sf::SoundBuffer& bee
     }
 }
 
-void EmuCore::pushBuffer(Chip8& chip8, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect)
+void EmuCore::pushBuffer()
 {
     auto [x_range, y_range] = chip8.get_GfxRange();
 
@@ -172,7 +172,7 @@ bool EmuCore::loadROM()
     }
 }
 
-void EmuCore::keyStateReleased(Chip8& chip8, sf::Event& keyState)
+void EmuCore::keyStateReleased()
 {
     switch (keyState.key.code)
     {
@@ -229,7 +229,7 @@ void EmuCore::keyStateReleased(Chip8& chip8, sf::Event& keyState)
     }
 }
 
-void EmuCore::keyStatePressed(Chip8& chip8, sf::Event& event, sf::SoundBuffer& beepBuffer, sf::Sound& beepSound, sf::RenderWindow& mainWindow, sf::RectangleShape& chip8SpriteRect)
+void EmuCore::keyStatePressed()
 {
     sf::Event keyState;
     keyState = event;
@@ -246,7 +246,7 @@ void EmuCore::keyStatePressed(Chip8& chip8, sf::Event& event, sf::SoundBuffer& b
         std::cout << "Current ROM loaded:" << romName;
 #endif // _DEBUG
 
-        this->EmulationLoop(chip8, event, beepBuffer, beepSound, mainWindow, chip8SpriteRect);
+        this->EmulationLoop();
         break;
     case sf::Keyboard::F2:
         mainWindow.clear(sf::Color::Black);
