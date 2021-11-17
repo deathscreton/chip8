@@ -37,9 +37,9 @@ public:
     //External function that writes to memory.
     bool writeMem(uint32_t fsize, std::vector<char>& romBuffer);
 
-    //External function used to read portions of the memory. This is currently empty as it'll be used by the debugger and not much else. 
+    /*//External function used to read portions of the memory. This is currently empty as it'll be used by the debugger and not much else. 
     //The debugger has yet to be implemented.
-    bool readMem();
+    bool readMem();*/
 
     //Method used to return values for x and y for the gfx buffer. 
     auto get_GfxRange() { return range; }

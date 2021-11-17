@@ -20,7 +20,7 @@ uint8_t const fontset[80] =             //Fontset, 0-F hex, each sprite is five 
     0xF0, 0x80, 0xF0, 0x80, 0x80    // F
 };
 
-uint8_t const fontset10[160] =        //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes. Two different sets of fontstyles. Either should work.
+uint8_t const fontset10[160] =        //Fontset for SCHIP8, 0-F hex, each sprite is ten bytes.
 {
     0xF0, 0xF0, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0xF0, 0xF0, // 0
     0x20, 0x20, 0x60, 0x60, 0x20, 0x20, 0x20, 0x20, 0x70, 0x70, // 1
@@ -240,12 +240,12 @@ bool Chip8::writeMem(uint32_t fsize, std::vector<char>& romBuffer)
     return true;
 }
 
-//External function used to read portions of the memory. This is currently empty as it'll be used by the debugger and not much else. 
+/*//External function used to read portions of the memory. This is currently empty as it'll be used by the debugger and not much else. 
 //The debugger has yet to be implemented.
 bool Chip8::readMem()
 {
 
-}
+}*/
 
 //Function responsible for a single emulated CPU cycle.
 void Chip8::emulateCycle()

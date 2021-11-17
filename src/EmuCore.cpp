@@ -1,5 +1,10 @@
 #include "EmuCore.hpp"
 
+EmuCore::EmuCore()
+{
+
+}
+
 void EmuCore::Init(const uint32_t argc, const char* rom)
 {
     this->StartEmu(argc, rom);
@@ -67,7 +72,6 @@ void EmuCore::EmulationLoop()
         if (chip8.drawFlag)
         {
             mainWindow.clear(sf::Color::Black);
-
             pushBuffer();
 
 #ifdef _DEBUG
@@ -75,7 +79,6 @@ void EmuCore::EmulationLoop()
 #endif // _DEBUG
 
             mainWindow.display();
-
             chip8.drawFlag = false;
         }
         if (chip8.playSound)
@@ -165,73 +168,16 @@ bool EmuCore::loadROM()
     }
 
     //write buffer to memory
-    if (chip8.writeMem(fsize, romBuffer))
+    if (!chip8.writeMem(fsize, romBuffer))
     {
-        std::cerr << "Something went terribly wrong writing to buffer. \n";
+        std::cerr << "Something went terribly wrong writing to memory. \n";
         return false;
     }
-}
-
-void EmuCore::keyStateReleased()
-{
-    switch (keyState.key.code)
-    {
-    case sf::Keyboard::Num1:
-        chip8.key[0x1] = 0;
-        break;
-    case sf::Keyboard::Num2:
-        chip8.key[0x2] = 0;
-        break;
-    case sf::Keyboard::Num3:
-        chip8.key[0x3] = 0;
-        break;
-    case sf::Keyboard::Num4:
-        chip8.key[0xC] = 0;
-        break;
-    case sf::Keyboard::Q:
-        chip8.key[0x4] = 0;
-        break;
-    case sf::Keyboard::W:
-        chip8.key[0x5] = 0;
-        break;
-    case sf::Keyboard::E:
-        chip8.key[0x6] = 0;
-        break;
-    case sf::Keyboard::R:
-        chip8.key[0xD] = 0;
-        break;
-    case sf::Keyboard::A:
-        chip8.key[0x7] = 0;
-        break;
-    case sf::Keyboard::S:
-        chip8.key[0x8] = 0;
-        break;
-    case sf::Keyboard::D:
-        chip8.key[0x9] = 0;
-        break;
-    case sf::Keyboard::F:
-        chip8.key[0xE] = 0;
-        break;
-    case sf::Keyboard::Z:
-        chip8.key[0xA] = 0;
-        break;
-    case sf::Keyboard::X:
-        chip8.key[0x0] = 0;
-        break;
-    case sf::Keyboard::C:
-        chip8.key[0xB] = 0;
-        break;
-    case sf::Keyboard::V:
-        chip8.key[0xF] = 0;
-        break;
-    default:
-        break;
-    }
+    return true;
 }
 
 void EmuCore::keyStatePressed()
 {
-    sf::Event keyState;
     keyState = event;
 
     switch (keyState.key.code)
@@ -310,6 +256,65 @@ void EmuCore::keyStatePressed()
         break;
     case sf::Keyboard::V:
         chip8.key[0xF] = 1;
+        break;
+    default:
+        break;
+    }
+}
+
+void EmuCore::keyStateReleased()
+{
+    keyState = event;
+
+    switch (keyState.key.code)
+    {
+    case sf::Keyboard::Num1:
+        chip8.key[0x1] = 0;
+        break;
+    case sf::Keyboard::Num2:
+        chip8.key[0x2] = 0;
+        break;
+    case sf::Keyboard::Num3:
+        chip8.key[0x3] = 0;
+        break;
+    case sf::Keyboard::Num4:
+        chip8.key[0xC] = 0;
+        break;
+    case sf::Keyboard::Q:
+        chip8.key[0x4] = 0;
+        break;
+    case sf::Keyboard::W:
+        chip8.key[0x5] = 0;
+        break;
+    case sf::Keyboard::E:
+        chip8.key[0x6] = 0;
+        break;
+    case sf::Keyboard::R:
+        chip8.key[0xD] = 0;
+        break;
+    case sf::Keyboard::A:
+        chip8.key[0x7] = 0;
+        break;
+    case sf::Keyboard::S:
+        chip8.key[0x8] = 0;
+        break;
+    case sf::Keyboard::D:
+        chip8.key[0x9] = 0;
+        break;
+    case sf::Keyboard::F:
+        chip8.key[0xE] = 0;
+        break;
+    case sf::Keyboard::Z:
+        chip8.key[0xA] = 0;
+        break;
+    case sf::Keyboard::X:
+        chip8.key[0x0] = 0;
+        break;
+    case sf::Keyboard::C:
+        chip8.key[0xB] = 0;
+        break;
+    case sf::Keyboard::V:
+        chip8.key[0xF] = 0;
         break;
     default:
         break;

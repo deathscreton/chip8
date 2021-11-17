@@ -34,6 +34,7 @@ private:
 
 	Chip8 chip8; //Creates emulator object and initializes class state using constructor
 	sf::Event event; //Creates event object to contain event types necessary for interactivity.
+	sf::Event keyState; //Creates event object titled keyState to hold state of key presses.
 	sf::SoundBuffer beepBuffer; //Creates sound buffer to hold beep.wav file.
 	sf::Sound beepSound; //Creates sound object to control buffer playback.
 	sf::RenderWindow mainWindow{sf::VideoMode(1280, 720), "Chip 8 Emulator"}; //Create and initalize a Window object for rendering.
